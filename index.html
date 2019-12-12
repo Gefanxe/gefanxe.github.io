@@ -1,200 +1,106 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="vue_2.6.10.min.js"></script>
+    <script src="component.js"></script>
+    <script src="app.js"></script>
 </head>
+
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="page-header">
-                    <h1>
-                        LayoutIt! <small>Interface Builder for Bootstrap</small>
-                    </h1>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <ul class="nav">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Profile</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link disabled" href="#">Messages</a>
-                    </li>
-                    <li class="nav-item dropdown ml-md-auto">
-                         <a class="nav-link dropdown-toggle" href="http://example.com" id="navbarDropdownMenuLink" data-toggle="dropdown">Dropdown link</a>
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownMenuLink">
-                             <a class="dropdown-item" href="#">Action</a> <a class="dropdown-item" href="#">Another action</a> <a class="dropdown-item" href="#">Something else here</a>
-                            <div class="dropdown-divider">
-                            </div> <a class="dropdown-item" href="#">Separated link</a>
-                        </div>
-                    </li>
-                </ul>
-                <nav>
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item">
-                            <a href="#">Home</a>
-                        </li>
-                        <li class="breadcrumb-item">
-                            <a href="#">Library</a>
-                        </li>
-                        <li class="breadcrumb-item active">
-                            Data
-                        </li>
-                    </ol>
-                </nav>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-4">
-                <div class="list-group">
-                     <a href="#" class="list-group-item list-group-item-action active">Home</a>
-                    <div class="list-group-item">
-                        List header
-                    </div>
-                    <div class="list-group-item">
-                        <h4 class="list-group-item-heading">
-                            List group item heading
-                        </h4>
-                        <p class="list-group-item-text">
-                            ...
-                        </p>
-                    </div>
-                    <div class="list-group-item justify-content-between">
-                        Help <span class="badge badge-secondary badge-pill">14</span>
-                    </div> <a href="#" class="list-group-item list-group-item-action active justify-content-between">Home <span class="badge badge-light badge-pill">14</span></a>
-                </div>
-            </div>
-            <div class="col-md-8">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>
-                                #
-                            </th>
-                            <th>
-                                Product
-                            </th>
-                            <th>
-                                Payment Taken
-                            </th>
-                            <th>
-                                Status
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                1
-                            </td>
-                            <td>
-                                TB - Monthly
-                            </td>
-                            <td>
-                                01/04/2012
-                            </td>
-                            <td>
-                                Default
-                            </td>
-                        </tr>
-                        <tr class="table-active">
-                            <td>
-                                1
-                            </td>
-                            <td>
-                                TB - Monthly
-                            </td>
-                            <td>
-                                01/04/2012
-                            </td>
-                            <td>
-                                Approved
-                            </td>
-                        </tr>
-                        <tr class="table-success">
-                            <td>
-                                2
-                            </td>
-                            <td>
-                                TB - Monthly
-                            </td>
-                            <td>
-                                02/04/2012
-                            </td>
-                            <td>
-                                Declined
-                            </td>
-                        </tr>
-                        <tr class="table-warning">
-                            <td>
-                                3
-                            </td>
-                            <td>
-                                TB - Monthly
-                            </td>
-                            <td>
-                                03/04/2012
-                            </td>
-                            <td>
-                                Pending
-                            </td>
-                        </tr>
-                        <tr class="table-danger">
-                            <td>
-                                4
-                            </td>
-                            <td>
-                                TB - Monthly
-                            </td>
-                            <td>
-                                04/04/2012
-                            </td>
-                            <td>
-                                Call in to confirm
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <nav>
-                    <ul class="pagination">
-                        <li class="page-item">
-                            <a class="page-link" href="#">Previous</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">1</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">2</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">3</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">4</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">5</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">Next</a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-        </div>
+    <div id="app">
+        {{ message }} <br>
+        <ex name="Andersen"></ex>
     </div>
+    <hr>
+    <h1>參考資料</h1>
+    <ul>
+        <li>
+            <a href="https://github.com/goodjack/developer-roadmap-chinese">2019 年成為 Web 開發人員的路線圖</a>
+        </li>
+        <li>
+            <a href="https://github.com/utilForever/game-developer-roadmap">Roadmap to becoming a game developer in 2018</a>
+        </li>
+        <li>
+
+        </li>
+    </ul>
+    <h1>好用的開源後台前端專案</h1>
+    <ul>
+        <li>
+            <a href="https://github.com/PanJiaChen/vue-element-admin">vue-element-admin</a>
+        </li>
+        <li>
+            <a href="https://github.com/Armour/vue-typescript-admin-template">vue-typescript-admin-template</a>
+        </li>
+        <li>
+
+        </li>
+    </ul>
+    <h1>遊戲範例</h1>
+    <ul>
+        <li>
+            <a href="https://github.com/bournes/layaair2-SG">大將軍(layabox 2.0.2)</a>
+        </li>
+        <li>
+            
+        </li>
+        <li>
+
+        </li>
+    </ul>
+    <h1>機器學習 / 深度學習</h1>
+    <ul>
+        <li>
+            <a href="https://github.com/root-master/live-mnist">攝影機辨識手寫數字</a>
+        </li>
+        <li>
+
+        </li>
+        <li>
+
+        </li>
+    </ul>
+    <h1>命令列工具</h1>
+    <ul>
+        <li>
+            <a href="https://github.com/chirlu/sox">sox</a>
+        </li>
+        <li>
+            <a href="https://github.com/trentm/json">json</a>
+        </li>
+        <li>
+
+        </li>
+    </ul>
+    <h1>UI Library</h1>
+    <ul>
+        <li>
+            <a href="https://github.com/nostalgic-css/NES.css">NES-style CSS Framework</a>
+        </li>
+        <li>
+            
+        </li>
+        <li>
+            
+        </li>
+    </ul>
+    <h1>其他</h1>
+    <ul>
+        <li>
+            <a href="https://github.com/jeromeetienne/AR.js">應用於Web的AR輕量級函式庫</a>
+        </li>
+        <li>
+
+        </li>
+        <li>
+            
+        </li>
+    </ul>
 </body>
+
 </html>
