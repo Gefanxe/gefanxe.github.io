@@ -1,11 +1,9 @@
 let tpl = `
 <v-card max-width="344" class="mx-auto">
     <v-list-item>
-        <v-list-item-avatar color="grey">
-        </v-list-item-avatar>
+        <v-list-item-avatar color="grey" v-text="index"></v-list-item-avatar>
         <v-list-item-content>
-            <v-list-item-title class="headline">Our Changing Planet</v-list-item-title>
-            <v-list-item-subtitle>by Kurt Wagner</v-list-item-subtitle>
+            <v-list-item-title class="headline" v-text="title">Our Changing Planet</v-list-item-title>
         </v-list-item-content>
     </v-list-item>
 
@@ -40,14 +38,26 @@ let tpl = `
 `;
 
 Vue.component('tip-cards', {
-    props: ['rand'],
+    props: {
+        tip: {
+            type: Object,
+            default: function() {
+                return {
+                    index: 99,
+                    title: '提示卡標題',
+                    content: '提示卡內容描述',
+                    img: 'https://cdn.vuetifyjs.com/images/cards/mountain.jpg'
+                }
+            }
+        }
+    },
     template: tpl,
     data() {
         return {
-            def: 'this is component',
-            firstStr: '',
-            unix: '',
-            now: ''
+            index: this.tip.index,
+            title: this.tip.title,
+            content: this.tip.content,
+            img: this.tip.img
         }
     },
     created() {
