@@ -33,40 +33,25 @@ document.addEventListener("DOMContentLoaded", function () {
     watch: {
       loadTips: function(value) {
         if (value) {
-          // this.preloadImgAll();
           this.initProcessData();
         }
       }
     },
     methods: {
-      preloadImgAll() {
-        let imgid = 0;
-        for (let index = 1; index < this.total; index++) {
-          imgid = this.tips_list.data[index].imgid;
-          this.preloadImage(imgid);
-        }
-      },
-      preloadImage(imgid) {
-        var img=new Image();
-        img.src=`https://picsum.photos/id/${imgid}/344/194`;
-        console.dir(img);
-      },
       handleChangeCard() {
         var usedCount = this.used.length;
         if (usedCount < (this.total - 1)) {
-          console.log('usedCount', usedCount);
-          var rand = Math.floor(Math.random() * ((this.total - 1) - usedCount));
-          console.log('rand', rand);
+          var rand = Math.floor(Math.random() * ((this.total - 1) - usedCount)) + 1;
           // var selected = this.unuse.splice(rand, 1)[0];
           // console.log('selected', selected);
           this.showIdx = rand;
+          console.log('showIdx:', this.showIdx);
         } else {
           alert('沒東西了')
         }
       },
       handleTest() {
-        console.log('showIdx', this.showIdx);
-        console.log('tips_list.data', this.tips_list.data);
+        
       },
       // 讀取提示Json資料
       loadJsonData(nextFunction) {
@@ -80,7 +65,14 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       },
       changeLoadTipsStatus() {
-        this.loadTips = true;
+        let self = this;
+        self.loadTips = true;
+        window.addEventListener('keyup', function(evt) {
+          console.log('keyCode:', evt.keyCode);
+          if (evt.keyCode === 32) {
+            self.handleChangeCard();
+          }
+        });
       },
       initProcessData() {
         let mem = localStorage.getItem('mem');
@@ -93,7 +85,8 @@ document.addEventListener("DOMContentLoaded", function () {
             this.unuse.push(index + 1);
           }
           // 先取一個
-          this.showIdx = Math.floor(Math.random() * (this.total - 1))
+          this.showIdx = Math.floor(Math.random() * (this.total - 1)) + 1
+          console.log('showIdx:', this.showIdx);
         }
       }
     }

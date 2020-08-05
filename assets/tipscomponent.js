@@ -59,7 +59,7 @@ Vue.component("tip-cards", {
         if (this.tip.imgid === 0) {
           return '/assets/Loading.png';
         } else {
-          return `https://picsum.photos/id/${this.tip.imgid}/344/194`;
+          return `/imgs/${this.tip.imgid}.jpg`;
         }
       },
     },
