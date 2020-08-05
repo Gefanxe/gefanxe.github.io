@@ -7,7 +7,7 @@ let tpl = `
         </v-list-item-content>
     </v-list-item>
 
-    <v-img v-bind:src="img" height="194"></v-img>
+    <v-img v-bind:src="imgid" height="194"></v-img>
 
 <v-card-text v-text="content"></v-card-text>
 
@@ -30,10 +30,10 @@ Vue.component("tip-cards", {
       type: Object,
       default: function () {
         return {
-          index: 99,
+          index: 0,
           title: "提示卡標題",
           content: "提示卡內容描述",
-          img: "https://cdn.vuetifyjs.com/images/cards/mountain.jpg",
+          imgid: 0,
         };
       },
     },
@@ -54,9 +54,13 @@ Vue.component("tip-cards", {
         return this.tip.content;
       },
     },
-    img: {
+    imgid: {
       get() {
-        return this.tip.img;
+        if (this.tip.imgid === 0) {
+          return '/assets/Loading.png';
+        } else {
+          return `https://picsum.photos/id/${this.tip.imgid}/344/194`;
+        }
       },
     },
   },

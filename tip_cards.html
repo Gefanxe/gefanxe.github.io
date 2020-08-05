@@ -42,7 +42,7 @@
         {{ message }} <br>
         <div class="my-tips-card-list">
             <tip-cards
-                :tip.sync="tips_list.data[0]">
+                :tip.sync="tips_list.data[showIdx]">
             </tip-cards>
         </div>
 
