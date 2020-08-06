@@ -16,8 +16,9 @@ document.addEventListener("DOMContentLoaded", function () {
         ]
       },
       loadTips: false,
-      mem: {},
       showIdx: 0,
+      realShowIdx: 0,
+      showIdxVal: 0,
       total: 0,
       used: [],
       unuse: []
@@ -38,16 +39,35 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     },
     methods: {
+      resetProcessArray() {
+        this.used = [];
+        for (let index = 0; index < this.total - 1; index++) {
+          this.unuse.push(index + 1);
+        }
+      },
+      handleReadTip() {
+        console.log('realShowIdx:', this.realShowIdx);
+        console.log('used.includes?', this.used.includes(this.realShowIdx));
+        if (!this.used.includes(this.realShowIdx)) {
+          if (this.used.length < (this.total - 1)) {
+            this.showIdxVal = this.unuse.splice((this.showIdx - 1), 1)[0]
+            this.used.push(this.showIdxVal);
+          
+            console.log('this.used.length:', this.used.length);
+            console.log('total - 1:', (this.total - 1));
+            if (this.used.length === (this.total - 1)) this.resetProcessArray();
+          }
+        }
+      },
       handleChangeCard() {
-        var usedCount = this.used.length;
-        if (usedCount < (this.total - 1)) {
-          var rand = Math.floor(Math.random() * ((this.total - 1) - usedCount)) + 1;
-          // var selected = this.unuse.splice(rand, 1)[0];
-          // console.log('selected', selected);
+        if (this.used.length < (this.total - 1)) {
+          var rand = Math.floor(Math.random() * ((this.total - 1) - this.used.length)) + 1;
           this.showIdx = rand;
-          console.log('showIdx:', this.showIdx);
-        } else {
-          alert('沒東西了')
+          this.realShowIdx = this.unuse[this.showIdx - 1];
+          
+          console.log('this.used.length:', this.used.length);
+          console.log('total - 1:', (this.total - 1));
+          if (this.used.length === (this.total - 1)) this.resetProcessArray();
         }
       },
       handleTest() {
@@ -68,9 +88,12 @@ document.addEventListener("DOMContentLoaded", function () {
         let self = this;
         self.loadTips = true;
         window.addEventListener('keyup', function(evt) {
-          console.log('keyCode:', evt.keyCode);
+          // console.log('keyCode:', evt.keyCode);
           if (evt.keyCode === 32) {
             self.handleChangeCard();
+          }
+          if (evt.keyCode === 82) {
+            self.handleReadTip();
           }
         });
       },
@@ -81,12 +104,10 @@ document.addEventListener("DOMContentLoaded", function () {
           this.used = mem.used;
           this.unuse = mem.unuse;
         } else {
-          for (let index = 0; index < this.total - 1; index++) {
-            this.unuse.push(index + 1);
-          }
+          this.resetProcessArray();
           // 先取一個
           this.showIdx = Math.floor(Math.random() * (this.total - 1)) + 1
-          console.log('showIdx:', this.showIdx);
+          this.realShowIdx = this.unuse[this.showIdx - 1];
         }
       }
     }

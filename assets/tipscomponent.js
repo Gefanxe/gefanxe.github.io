@@ -12,7 +12,7 @@ let tpl = `
 <v-card-text v-text="content"></v-card-text>
 
 <v-card-actions>
-    <v-btn @click="handleClick">Read</v-btn>
+    <v-btn @click="handleRead">Read</v-btn>
     <v-spacer></v-spacer>
     <v-btn icon>
         <v-icon>mdi-heart</v-icon>
@@ -69,8 +69,8 @@ Vue.component("tip-cards", {
     console.log("component created!");
   },
   methods: {
-    handleClick() {
-      console.log('compoment data:', this.title);
+    handleRead() {
+      this.$emit('tip-read');
     }
   },
 });
