@@ -3,7 +3,7 @@ let tpl = `
     <v-list-item>
         <v-list-item-avatar color="grey" v-text="index"></v-list-item-avatar>
         <v-list-item-content>
-            <v-list-item-title class="headline" v-text="title"></v-list-item-title>
+            <v-list-item-title v-text="title"></v-list-item-title>
         </v-list-item-content>
     </v-list-item>
 
