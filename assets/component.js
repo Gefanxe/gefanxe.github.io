@@ -4,7 +4,7 @@ let tpl = `
     <button @click="handleClick">click me</button>
     <hr>
     concat string <input type="text" v-model="firstStr" > <br>
-    unix timestamp <input type="text" v-model="unix" > <br>
+    unix timestamp <input type="text" v-model="unix" size="30"> <br>
     <button @click="handleGenerateUnixTime">Gen Unix Time</button>
     <button @click="handleReductionUnixTime">Reduction Unix Time</button> <br>
     transfer <input type="text" v-model="now" >
