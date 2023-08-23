@@ -1,0 +1,25 @@
+<mxfile host="app.diagrams.net" modified="2023-08-02T07:38:01.128Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36" etag="KV7cbowEGCvy9SVc2SjD" version="21.6.6" type="github">
+  <diagram id="6a731a19-8d31-9384-78a2-239565b7b9f0" name="Page-1">
+    <mxGraphModel dx="1114" dy="578" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" background="none" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="1IQiPcvL6_2Fs0PneCvl-56" value="" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.start_1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="110" y="60" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="1IQiPcvL6_2Fs0PneCvl-57" value="" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="110" y="170" width="100" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="1IQiPcvL6_2Fs0PneCvl-58" value="" style="verticalLabelPosition=bottom;verticalAlign=top;html=1;shape=process;whiteSpace=wrap;rounded=1;size=0.14;arcSize=6;" vertex="1" parent="1">
+          <mxGeometry x="110" y="300" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="1IQiPcvL6_2Fs0PneCvl-59" value="" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.decision;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="110" y="420" width="100" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="1IQiPcvL6_2Fs0PneCvl-60" value="" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.start_1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="110" y="600" width="100" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
