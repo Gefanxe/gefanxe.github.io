@@ -200,6 +200,12 @@
       gap: 12px;
       color: var(--muted);
       font-size: 16px;
+      position: relative;
+    }
+    .footer-center{
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
     .footer img{
       width: 32px;
@@ -209,6 +215,12 @@
     .footer-text{
       font-weight: 600;
       color: var(--text);
+    }
+    .footer-year{
+      position: absolute;
+      right: 0;
+      font-weight: 600;
+      color: #ffb74c;
     }
   </style>
 </head>
@@ -249,8 +261,11 @@
 
     <!-- Footer -->
     <footer class="footer">
-      <img src="./images/Facebook_Logo_Primary.png" alt="Facebook Logo">
-      <span class="footer-text">小于媽ㄟ用芯生活</span>
+      <div class="footer-center">
+        <img src="./images/Facebook_Logo_Primary.png" alt="Facebook Logo">
+        <span class="footer-text">小于媽ㄟ用芯生活</span>
+      </div>
+      <div class="footer-year">2025.09</div>
     </footer>
   </main>
 
@@ -363,7 +378,7 @@
           
           const startTime = ctx.currentTime + i * 0.15;
           g.gain.setValueAtTime(0.001, startTime);
-          g.gain.exponentialRampToValueAtTime(0.3, startTime + 0.02);
+          g.gain.exponentialRampToValueAtTime(0.25, startTime + 0.02);
           g.gain.exponentialRampToValueAtTime(0.001, startTime + 0.12);
           
           o.start(startTime);
@@ -382,7 +397,7 @@
           
           const startTime = ctx.currentTime + i * 0.18;
           g.gain.setValueAtTime(0.001, startTime);
-          g.gain.exponentialRampToValueAtTime(0.25, startTime + 0.03);
+          g.gain.exponentialRampToValueAtTime(0.3, startTime + 0.03);
           g.gain.exponentialRampToValueAtTime(0.001, startTime + 0.15);
           
           o.start(startTime);
