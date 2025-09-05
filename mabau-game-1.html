@@ -190,6 +190,26 @@
     /* 規則6：避免輸入元件溢出容器 */
     *{ box-sizing:border-box; }
     input, select, textarea{ max-width:100%; }
+
+    /* Footer 樣式 */
+    .footer{
+      padding-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 16px;
+    }
+    .footer img{
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+    }
+    .footer-text{
+      font-weight: 600;
+      color: var(--text);
+    }
   </style>
 </head>
 <body>
@@ -226,6 +246,12 @@
         <button id="resetBtn" class="btn">🔄 重新開始（清分數）</button>
       </div>
     </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <img src="./images/Facebook_Logo_Primary.png" alt="Facebook Logo">
+      <span class="footer-text">小于媽ㄟ用芯生活</span>
+    </footer>
   </main>
 
   <script>
@@ -431,6 +457,8 @@
         feedbackEl.className = 'feedback ok';
         btn.classList.add('correct');
         beep(true);
+        // 答對時1.3秒後自動下一題
+        setTimeout(()=>{ newQuestion(); }, 1300);
       }else{
         streak = 0;
         streakEl.textContent = streak;
@@ -442,10 +470,8 @@
           if(b.textContent.trim().includes(correct.han)) b.classList.add('correct');
         });
         beep(false);
+        // 答錯時不自動跳題，需手動按下一題
       }
-
-      // 1.2 秒後自動下一題
-      setTimeout(()=>{ newQuestion(); }, 1200);
     }
 
     // 事件：開始／下一題／重置
