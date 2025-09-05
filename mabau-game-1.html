@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>量詞練習遊戲｜無限隨機・觸碰作答（50題＋注音）</title>
+  <style>
+    /* -----------------------------------------------------------
+       內嵌 Bootswatch：Yeti 風格（節錄並微調）
+       說明：依規則從 bootswatch 主題中隨機挑選並整合於 <style>。
+       著重色彩、按鈕、卡片、陰影、排版（已調整為暖色系）。
+    ------------------------------------------------------------*/
+    :root{
+      --primary:#ff7043;     /* 主色：活潑橘 */
+      --primary-dark:#f4511e;
+      --bg:#fff3e0;          /* 背景：淺橙 */
+      --text:#4e342e;        /* 文字：深棕 */
+      --card:#ffffff;        /* 卡片底色 */
+      --good:#2e7d32;        /* 正解：綠 */
+      --bad:#c62828;         /* 誤答：紅 */
+      --muted:#6d4c41;       /* 次要文字 */
+    }
+
+    /* 全域排版與 RWD */
+    html,body{height:100%;}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:'Microsoft JhengHei', Arial, sans-serif;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+
+    /* 容器卡片：採卡片+陰影風格 */
+    .app{
+      width:min(960px,100%);
+      background:var(--card);
+      border-radius:24px;
+      box-shadow:0 20px 40px rgba(0,0,0,0.08);
+      padding:clamp(16px,3vw,28px);
+    }
+
+    /* 標題列：emoji + Bootstrap Icons 風格（以emoji替代） */
+    .header{
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:12px;
+    }
+    .title{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-size:clamp(20px,3.2vw,28px);
+      font-weight:800;
+      color:var(--primary-dark);
+    }
+    .scoreboard{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      font-size:clamp(16px,2.4vw,20px);
+      color:var(--muted);
+    }
+    .badge{
+      background:var(--primary);
+      color:#fff;
+      padding:6px 12px;
+      border-radius:999px;
+      font-weight:700;
+      box-shadow:0 6px 16px rgba(244,81,30,.25);
+    }
+
+    /* 題目卡 */
+    .card{
+      background:#fff;
+      border:1px solid #ffe0b2;
+      border-radius:20px;
+      padding:clamp(14px,3vw,24px);
+      margin-top:8px;
+    }
+    .prompt{
+      display:grid;
+      grid-template-columns:1fr;
+      justify-items:center;
+      gap:10px;
+    }
+    .emoji{
+      font-size:clamp(48px,8vw,80px);
+      line-height:1;
+    }
+    .noun{
+      font-size:clamp(22px,3vw,28px);
+      font-weight:800;
+      text-align:center;
+      color:#5d4037;
+    }
+
+    ruby {
+      ruby-position: under;
+    }
+
+    ruby rt{
+      font-size:.7em;
+      color:#8d6e63;
+    }
+
+    ruby.ans rt{
+      font-size:.7em;
+      color:#ffffff;
+      margin-top: 5px;
+    }
+
+
+    /* 選項區：2欄 RWD，平板以上 4 欄 */
+    .options{
+      margin-top:16px;
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:12px;
+    }
+    @media (min-width:720px){
+      .options{ grid-template-columns:repeat(4, minmax(0,1fr)); }
+    }
+
+    /* 選項按鈕 */
+    .opt{
+      height: 100px;
+      border:none;
+      border-radius:16px;
+      /* padding:10px 10px 10px 10px; */
+      font-size:clamp(18px,2.4vw,22px);
+      font-weight:800;
+      background:var(--primary);
+      color:#fff;
+      cursor:pointer;
+      box-shadow:0 10px 20px rgba(255,112,67,.28);
+      transition:transform .06s ease, background .2s ease, box-shadow .2s ease;
+      touch-action:manipulation;
+    }
+    .opt:hover{ background:var(--primary-dark); }
+    .opt:active{ transform:translateY(1px); }
+
+    /* 作答後狀態 */
+    .opt.correct{ background:var(--good); box-shadow:0 10px 20px rgba(46,125,50,.28); }
+    .opt.wrong{ background:var(--bad); box-shadow:0 10px 20px rgba(198,40,40,.28); }
+
+    /* 底部控制列 */
+    .controls{
+      margin-top:16px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      justify-content:center;
+    }
+    .btn{
+      border:none;
+      background:#ffe0b2;
+      color:#6d4c41;
+      font-weight:800;
+      padding:10px 16px;
+      border-radius:12px;
+      cursor:pointer;
+      box-shadow:0 6px 12px rgba(0,0,0,.06);
+      transition:background .2s ease, transform .06s ease;
+      touch-action:manipulation;
+    }
+    .btn:hover{ background:#ffd08a; }
+    .btn:active{ transform:translateY(1px); }
+    .btn.primary{ background:var(--primary); color:#fff; }
+    .btn.primary:hover{ background:var(--primary-dark); }
+
+    /* 回饋訊息 */
+    .feedback{
+      min-height:1.8em;
+      text-align:center;
+      margin-top:10px;
+      font-size:clamp(18px,2.6vw,22px);
+      font-weight:800;
+    }
+    .feedback.ok{ color:var(--good); }
+    .feedback.no{ color:var(--bad); }
+
+    /* 規則6：避免輸入元件溢出容器 */
+    *{ box-sizing:border-box; }
+    input, select, textarea{ max-width:100%; }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <!-- 標題＋分數板 -->
+    <div class="header">
+      <div class="title">🎯 量詞練習遊戲（觸碰作答）</div>
+      <div class="scoreboard">
+        📊 分數 <span id="score" class="badge">0</span>
+        ✅ 連續答對 <span id="streak" class="badge" style="background:#66bb6a;box-shadow:0 6px 16px rgba(102,187,106,.25)">0</span>
+      </div>
+    </div>
+
+    <!-- 題目卡 -->
+    <section class="card">
+      <div class="prompt">
+        <div id="emoji" class="emoji">🍎</div>
+        <div id="noun" class="noun">
+          <!-- 以 ruby 顯示：中文字 + 注音 -->
+          <ruby><rb>蘋果</rb><rt>ㄆㄧㄥˊ ㄍㄨㄛˇ</rt></ruby>
+        </div>
+      </div>
+
+      <!-- 選項按鈕（量詞＋注音） -->
+      <div id="options" class="options"></div>
+
+      <!-- 回饋 -->
+      <div id="feedback" class="feedback"></div>
+
+      <!-- 控制列 -->
+      <div class="controls">
+        <button id="startBtn" class="btn primary">▶️ 開始練習</button>
+        <button id="nextBtn" class="btn">➡️ 下一題</button>
+        <button id="resetBtn" class="btn">🔄 重新開始（清分數）</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    /* -----------------------------------------------------------
+      關鍵說明（註解）：
+      1) 資料結構：每題含「emoji、題目中文字、題目注音、正確量詞、量詞注音」。
+      2) 出題：隨機抽題並生成 4 個量詞選項（含正解 + 3 個干擾）。
+      3) 互動：觸碰按鈕即作答；立即顯示正誤並上色，播放音效。
+      4) RWD：按鈕網格會隨螢幕寬度切換 2~4 欄。
+      5) 無限模式：不結束；可按「下一題」或答題完自動切換（1.2秒）。
+    ------------------------------------------------------------*/
+
+    // 量詞清單（提供隨機干擾用）
+    const MEASURES = [
+      {han:"顆",zy:"ㄎㄜ"}, {han:"隻",zy:"ㄓ"}, {han:"本",zy:"ㄅㄣˇ"}, {han:"支",zy:"ㄓ"},
+      {han:"把",zy:"ㄅㄚˇ"}, {han:"張",zy:"ㄓㄤ"}, {han:"輛",zy:"ㄌㄧㄤˋ"}, {han:"台",zy:"ㄊㄞˊ"},
+      {han:"部",zy:"ㄅㄨˋ"}, {han:"個",zy:"ㄍㄜˋ"}, {han:"封",zy:"ㄈㄥ"}, {han:"雙",zy:"ㄕㄨㄤ"},
+      {han:"條",zy:"ㄊㄧㄠˊ"}, {han:"件",zy:"ㄐㄧㄢˋ"}, {han:"頂",zy:"ㄉㄧㄥˇ"}, {han:"副",zy:"ㄈㄨˋ"},
+      {han:"朵",zy:"ㄉㄨㄛˇ"}, {han:"棵",zy:"ㄎㄜ"}, {han:"座",zy:"ㄗㄨㄛˋ"}, {han:"棟",zy:"ㄉㄨㄥˋ"},
+      {han:"輪",zy:"ㄌㄨㄣˊ"}, {han:"扇",zy:"ㄕㄢˋ"}
+    ];
+
+    // 題庫 50 題（題目＋正確量詞，全含注音）
+    const DATA = [
+      {emo:"🍎", n:"蘋果", nz:"ㄆㄧㄥˊ ㄍㄨㄛˇ", m:"顆", mz:"ㄎㄜ"},
+      {emo:"🐶", n:"狗", nz:"ㄍㄡˇ", m:"隻", mz:"ㄓ"},
+      {emo:"🐱", n:"貓", nz:"ㄇㄠ", m:"隻", mz:"ㄓ"},
+      {emo:"🐟", n:"魚", nz:"ㄩˊ", m:"條", mz:"ㄊㄧㄠˊ"},
+      {emo:"🐦", n:"鳥", nz:"ㄋㄧㄠˇ", m:"隻", mz:"ㄓ"},
+      {emo:"📖", n:"書", nz:"ㄕㄨ", m:"本", mz:"ㄅㄣˇ"},
+      {emo:"🖊️", n:"筆", nz:"ㄅㄧˇ", m:"支", mz:"ㄓ"},
+      {emo:"☂️", n:"雨傘", nz:"ㄩˇ ㄙㄢˇ", m:"把", mz:"ㄅㄚˇ"},
+      {emo:"🪑", n:"椅子", nz:"ㄧˇ ㄗ˙", m:"張", mz:"ㄓㄤ"},
+      {emo:"🛋️", n:"桌子", nz:"ㄓㄨㄛ ㄗ˙", m:"張", mz:"ㄓㄤ"},
+      {emo:"🚗", n:"車", nz:"ㄔㄜ", m:"輛", mz:"ㄌㄧㄤˋ"},
+      {emo:"🚲", n:"自行車", nz:"ㄗˋ ㄒㄧㄥˊ ㄔㄜ", m:"台", mz:"ㄊㄞˊ"},
+      {emo:"🖥️", n:"電腦", nz:"ㄉㄧㄢˋ ㄋㄠˇ", m:"台", mz:"ㄊㄞˊ"},
+      {emo:"📱", n:"手機", nz:"ㄕㄡˇ ㄐㄧ", m:"部", mz:"ㄅㄨˋ"},
+      {emo:"📺", n:"電視", nz:"ㄉㄧㄢˋ ㄕˋ", m:"部", mz:"ㄅㄨˋ"},
+      {emo:"🥤", n:"杯子", nz:"ㄅㄟ ㄗ˙", m:"個", mz:"ㄍㄜˋ"},
+      {emo:"✉️", n:"信", nz:"ㄒㄧㄣˋ", m:"封", mz:"ㄈㄥ"},
+      {emo:"👟", n:"鞋子", nz:"ㄒㄧㄝˊ ㄗ˙", m:"雙", mz:"ㄕㄨㄤ"},
+      {emo:"🥢", n:"筷子", nz:"ㄎㄨㄞˋ ㄗ˙", m:"雙", mz:"ㄕㄨㄤ"},
+      {emo:"👖", n:"褲子", nz:"ㄎㄨˋ ㄗ˙", m:"條", mz:"ㄊㄧㄠˊ"},
+      {emo:"👗", n:"裙子", nz:"ㄑㄩㄣˊ ㄗ˙", m:"件", mz:"ㄐㄧㄢˋ"},
+      {emo:"👕", n:"衣服", nz:"ㄧ ㄈㄨˊ", m:"件", mz:"ㄐㄧㄢˋ"},
+      {emo:"🧢", n:"帽子", nz:"ㄇㄠˋ ㄗ˙", m:"頂", mz:"ㄉㄧㄥˇ"},
+      {emo:"🧤", n:"手套", nz:"ㄕㄡˇ ㄊㄠˋ", m:"副", mz:"ㄈㄨˋ"},
+      {emo:"👓", n:"眼鏡", nz:"ㄧㄢˇ ㄐㄧㄥˋ", m:"副", mz:"ㄈㄨˋ"},
+      {emo:"🗺️", n:"地圖", nz:"ㄉㄧˋ ㄊㄨˊ", m:"張", mz:"ㄓㄤ"},
+      {emo:"🖼️", n:"相片", nz:"ㄒㄧㄤˋ ㄆㄧㄢˋ", m:"張", mz:"ㄓㄤ"},
+      {emo:"🎫", n:"票", nz:"ㄆㄧㄠˋ", m:"張", mz:"ㄓㄤ"},
+      {emo:"📄", n:"紙", nz:"ㄓˇ", m:"張", mz:"ㄓㄤ"},
+      {emo:"🍪", n:"餅乾", nz:"ㄅㄧㄥˇ ㄍㄢ", m:"片", mz:"ㄆㄧㄢˋ"},
+      {emo:"🎂", n:"蛋糕", nz:"ㄉㄢˋ ㄍㄠ", m:"塊", mz:"ㄎㄨㄞˋ"},
+      {emo:"🥯", n:"麵包", nz:"ㄇㄧㄢˋ ㄅㄠ", m:"個", mz:"ㄍㄜˋ"},
+      {emo:"🍉", n:"西瓜", nz:"ㄒㄧ ㄍㄨㄚ", m:"顆", mz:"ㄎㄜ"},
+      {emo:"🌸", n:"花", nz:"ㄏㄨㄚ", m:"朵", mz:"ㄉㄨㄛˇ"},
+      {emo:"🌳", n:"樹", nz:"ㄕㄨˋ", m:"棵", mz:"ㄎㄜ"},
+      {emo:"⛰️", n:"山", nz:"ㄕㄢ", m:"座", mz:"ㄗㄨㄛˋ"},
+      {emo:"🏠", n:"房子", nz:"ㄈㄤˊ ㄗ˙", m:"棟", mz:"ㄉㄨㄥˋ"},
+      {emo:"🌉", n:"橋", nz:"ㄑㄧㄠˊ", m:"座", mz:"ㄗㄨㄛˋ"},
+      {emo:"🏞️", n:"河", nz:"ㄏㄜˊ", m:"條", mz:"ㄊㄧㄠˊ"},
+      {emo:"🛤️", n:"路", nz:"ㄌㄨˋ", m:"條", mz:"ㄊㄧㄠˊ"},
+      {emo:"☁️", n:"雲", nz:"ㄩㄣˊ", m:"朵", mz:"ㄉㄨㄛˇ"},
+      {emo:"⭐", n:"星星", nz:"ㄒㄧㄥ ㄒㄧㄥ", m:"顆", mz:"ㄎㄜ"},
+      {emo:"🌞", n:"太陽", nz:"ㄊㄞˋ ㄧㄤˊ", m:"顆", mz:"ㄎㄜ"},
+      {emo:"🌕", n:"月亮", nz:"ㄩㄝˋ ㄌㄧㄤˋ", m:"輪", mz:"ㄌㄨㄣˊ"},
+      {emo:"🪥", n:"牙刷", nz:"ㄧㄚˊ ㄕㄨㄚ", m:"支", mz:"ㄓ"},
+      {emo:"🪥", n:"牙膏", nz:"ㄧㄚˊ ㄍㄠ", m:"條", mz:"ㄊㄧㄠˊ"},
+      {emo:"💡", n:"燈泡", nz:"ㄉㄥ ㄆㄠˋ", m:"顆", mz:"ㄎㄜ"},
+      {emo:"🗝️", n:"鑰匙", nz:"ㄧㄠˋ ㄕ˙", m:"把", mz:"ㄅㄚˇ"},
+      {emo:"🚪", n:"門", nz:"ㄇㄣˊ", m:"扇", mz:"ㄕㄢˋ"},
+      {emo:"🪟", n:"窗戶", nz:"ㄔㄨㄤ ㄏㄨˋ", m:"扇", mz:"ㄕㄢˋ"}
+    ];
+
+    // 狀態
+    let score = 0;
+    let streak = 0;
+    let current = null;
+    let usedIndex = -1;
+    let lock = false; // 防連點
+
+    // DOM
+    const scoreEl = document.getElementById('score');
+    const streakEl = document.getElementById('streak');
+    const emojiEl = document.getElementById('emoji');
+    const nounEl  = document.getElementById('noun');
+    const optsEl  = document.getElementById('options');
+    const feedbackEl = document.getElementById('feedback');
+    const startBtn = document.getElementById('startBtn');
+    const nextBtn  = document.getElementById('nextBtn');
+    const resetBtn = document.getElementById('resetBtn');
+
+    // Web Audio API：答對/答錯旋律
+    function beep(ok=true){
+      const ctx = new (window.AudioContext||window.webkitAudioContext)();
+      
+      if(ok){
+        // 答對旋律：Do-Mi-Sol 上行音階 (C-E-G)
+        const notes = [523.25, 659.25, 783.99]; // C5, E5, G5
+        notes.forEach((freq, i) => {
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.type = 'triangle';
+          o.frequency.value = freq;
+          o.connect(g);
+          g.connect(ctx.destination);
+          
+          const startTime = ctx.currentTime + i * 0.15;
+          g.gain.setValueAtTime(0.001, startTime);
+          g.gain.exponentialRampToValueAtTime(0.3, startTime + 0.02);
+          g.gain.exponentialRampToValueAtTime(0.001, startTime + 0.12);
+          
+          o.start(startTime);
+          o.stop(startTime + 0.12);
+        });
+      } else {
+        // 答錯旋律：Sol-Mi-Do 下行音階 (G-E-C)
+        const notes = [783.99, 659.25, 523.25]; // G5, E5, C5
+        notes.forEach((freq, i) => {
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.type = 'sawtooth';
+          o.frequency.value = freq;
+          o.connect(g);
+          g.connect(ctx.destination);
+          
+          const startTime = ctx.currentTime + i * 0.18;
+          g.gain.setValueAtTime(0.001, startTime);
+          g.gain.exponentialRampToValueAtTime(0.25, startTime + 0.03);
+          g.gain.exponentialRampToValueAtTime(0.001, startTime + 0.15);
+          
+          o.start(startTime);
+          o.stop(startTime + 0.15);
+        });
+      }
+    }
+
+    // 工具：隨機整數
+    const rnd = (n)=> Math.floor(Math.random()*n);
+
+    // 工具：從 MEASURES 取不同的干擾選項
+    function pickDistractors(correct, count=3){
+      const pool = MEASURES.filter(m=>m.han!==correct.han);
+      const out = [];
+      while(out.length<count && pool.length){
+        const i = rnd(pool.length);
+        out.push(pool.splice(i,1)[0]);
+      }
+      return out;
+    }
+
+    // 題面渲染（含注音 ruby）
+    function renderPrompt(q){
+      emojiEl.textContent = q.emo;
+      nounEl.innerHTML = `<ruby><rb>${q.n}</rb><rt>${q.nz}</rt></ruby>`;
+    }
+
+    // 產生一題
+    function newQuestion(){
+      lock = false;
+      feedbackEl.textContent = '';
+      feedbackEl.className = 'feedback';
+
+      // 避免連續同題
+      let idx;
+      do{ idx = rnd(DATA.length); }while(idx===usedIndex && DATA.length>1);
+      usedIndex = idx;
+      current = DATA[idx];
+
+      renderPrompt(current);
+
+      // 正解量詞物件
+      const correct = {han:current.m, zy:current.mz};
+
+      // 生成選項（正解 + 3 干擾），並洗牌
+      const options = [correct, ...pickDistractors(correct,3)]
+        .sort(()=>Math.random()-0.5);
+
+      // 繪製按鈕（量詞＋注音）
+      optsEl.innerHTML = '';
+      options.forEach(op=>{
+        const btn = document.createElement('button');
+        btn.className = 'opt';
+        btn.innerHTML = `<ruby class="ans"><rb>${op.han}</rb><rt>${op.zy}</rt></ruby>`;
+        btn.onclick = ()=> choose(op, correct, btn);
+        optsEl.appendChild(btn);
+      });
+    }
+
+    // 作答
+    function choose(sel, correct, btn){
+      if(lock) return;
+      lock = true;
+
+      const isOk = sel.han===correct.han;
+      if(isOk){
+        score++; streak++;
+        scoreEl.textContent = score;
+        streakEl.textContent = streak;
+        feedbackEl.textContent = '太棒了！答對了👏';
+        feedbackEl.className = 'feedback ok';
+        btn.classList.add('correct');
+        beep(true);
+      }else{
+        streak = 0;
+        streakEl.textContent = streak;
+        feedbackEl.innerHTML = `再想想～正確量詞是：<ruby><rb>${correct.han}</rb><rt>${correct.zy}</rt></ruby>`;
+        feedbackEl.className = 'feedback no';
+        btn.classList.add('wrong');
+        // 高亮正解
+        [...optsEl.children].forEach(b=>{
+          if(b.textContent.trim().includes(correct.han)) b.classList.add('correct');
+        });
+        beep(false);
+      }
+
+      // 1.2 秒後自動下一題
+      setTimeout(()=>{ newQuestion(); }, 1200);
+    }
+
+    // 事件：開始／下一題／重置
+    startBtn.onclick = ()=>{
+      score = 0; streak = 0;
+      scoreEl.textContent = score;
+      streakEl.textContent = streak;
+      newQuestion();
+    };
+    nextBtn.onclick = ()=> newQuestion();
+    resetBtn.onclick = ()=>{
+      score = 0; streak = 0;
+      scoreEl.textContent = score;
+      streakEl.textContent = streak;
+      feedbackEl.textContent = '';
+      feedbackEl.className = 'feedback';
+      newQuestion();
+    };
+
+    // 初次載入：等待使用者按「開始練習」
+  </script>
+</body>
+</html>
