@@ -378,7 +378,7 @@
           
           const startTime = ctx.currentTime + i * 0.15;
           g.gain.setValueAtTime(0.001, startTime);
-          g.gain.exponentialRampToValueAtTime(0.25, startTime + 0.02);
+          g.gain.exponentialRampToValueAtTime(0.13, startTime + 0.03);
           g.gain.exponentialRampToValueAtTime(0.001, startTime + 0.12);
           
           o.start(startTime);
@@ -397,7 +397,7 @@
           
           const startTime = ctx.currentTime + i * 0.18;
           g.gain.setValueAtTime(0.001, startTime);
-          g.gain.exponentialRampToValueAtTime(0.3, startTime + 0.03);
+          g.gain.exponentialRampToValueAtTime(0.02, startTime + 0.02);
           g.gain.exponentialRampToValueAtTime(0.001, startTime + 0.15);
           
           o.start(startTime);
