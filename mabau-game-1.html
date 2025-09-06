@@ -176,6 +176,11 @@
     .btn.primary{ background:var(--primary); color:#fff; }
     .btn.primary:hover{ background:var(--primary-dark); }
 
+    /* 按鈕隱藏樣式 */
+    .btn.hidden {
+      display: none;
+    }
+
     /* 回饋訊息 */
     .feedback{
       min-height:1.8em;
@@ -272,8 +277,8 @@
       <!-- 控制列 -->
       <div class="controls">
         <button id="startBtn" class="btn primary">▶️ 開始練習</button>
-        <button id="nextBtn" class="btn">➡️ 下一題</button>
-        <button id="resetBtn" class="btn">🔄 重新開始（清分數）</button>
+        <button id="nextBtn" class="btn hidden">➡️ 下一題</button>
+        <button id="resetBtn" class="btn hidden">🔄 重新開始（清分數）</button>
       </div>
     </section>
 
@@ -512,6 +517,12 @@
       score = 0; streak = 0;
       scoreEl.textContent = score;
       streakEl.textContent = streak;
+      
+      // 隱藏開始按鈕，顯示其他控制按鈕
+      startBtn.classList.add('hidden');
+      nextBtn.classList.remove('hidden');
+      resetBtn.classList.remove('hidden');
+      
       newQuestion();
     };
     nextBtn.onclick = ()=> newQuestion();
@@ -521,7 +532,16 @@
       streakEl.textContent = streak;
       feedbackEl.textContent = '';
       feedbackEl.className = 'feedback';
-      newQuestion();
+      
+      // 重置按鈕顯示狀態
+      startBtn.classList.remove('hidden');
+      nextBtn.classList.add('hidden');
+      resetBtn.classList.add('hidden');
+      
+      // 清空題目顯示
+      emojiEl.textContent = '🍎';
+      nounEl.innerHTML = '<ruby><rb>蘋果</rb><rt>ㄆㄧㄥˊ ㄍㄨㄛˇ</rt></ruby>';
+      optsEl.innerHTML = '';
     };
 
     // 初次載入：等待使用者按「開始練習」

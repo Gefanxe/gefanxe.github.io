@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>語音輸入</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+        }
+        #voiceBtn {
+            padding: 20px 40px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #voiceBtn:disabled {
+            background-color: #cccccc;
+        }
+        #countdown {
+            font-size: 24px;
+            margin: 20px 0;
+            color: #ff6b6b;
+        }
+        #result {
+            margin-top: 30px;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            min-height: 50px;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>中文語音輸入</h1>
+    <button id="voiceBtn">開始語音輸入</button>
+    <div id="countdown"></div>
+    <div id="result">語音結果將顯示在這裡...</div>
+
+    <script>
+        const voiceBtn = document.getElementById('voiceBtn');
+        const countdown = document.getElementById('countdown');
+        const result = document.getElementById('result');
+
+        // 頁面載入時要求麥克風權限
+        window.addEventListener('load', requestMicrophonePermission);
+
+        function requestMicrophonePermission() {
+            // 檢查瀏覽器是否支援語音識別
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                result.textContent = '您的瀏覽器不支援語音識別功能';
+                voiceBtn.disabled = true;
+                return;
+            }
+
+            // 要求麥克風權限
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(function(stream) {
+                    // 權限取得成功，停止錄音流
+                    stream.getTracks().forEach(track => track.stop());
+                    result.textContent = '麥克風權限已取得，點擊按鈕開始語音輸入';
+                })
+                .catch(function(error) {
+                    result.textContent = '需要麥克風權限才能使用語音輸入功能';
+                    voiceBtn.disabled = true;
+                });
+        }
+
+        voiceBtn.addEventListener('click', startVoiceInput);
+
+        function startVoiceInput() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+            
+            recognition.lang = 'zh-TW';
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            voiceBtn.disabled = true;
+            result.textContent = '準備開始語音輸入...';
+
+            // 開始倒數
+            let timeLeft = 3;
+            countdown.textContent = `剩餘時間: ${timeLeft} 秒`;
+            
+            const timer = setInterval(() => {
+                timeLeft--;
+                countdown.textContent = `剩餘時間: ${timeLeft} 秒`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    countdown.textContent = '';
+                    recognition.stop();
+                }
+            }, 1000);
+
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                result.textContent = `語音輸入結果: ${transcript}`;
+            };
+
+            recognition.onerror = function(event) {
+                result.textContent = `語音識別錯誤: ${event.error}`;
+            };
+
+            recognition.onend = function() {
+                voiceBtn.disabled = false;
+                clearInterval(timer);
+                countdown.textContent = '';
+                if (result.textContent === '準備開始語音輸入...' || result.textContent === '語音結果將顯示在這裡...') {
+                    result.textContent = '沒有檢測到語音輸入';
+                }
+            };
+
+            recognition.start();
+        }
+    </script>
+</body>
+</html>
