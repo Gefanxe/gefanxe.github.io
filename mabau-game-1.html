@@ -29,9 +29,8 @@
       color:var(--text);
       font-family:'Microsoft JhengHei', Arial, sans-serif;
       display:flex;
-      align-items:center;
       justify-content:center;
-      padding:24px;
+      padding:24px 24px 48px 24px;
     }
 
     /* 容器卡片：採卡片+陰影風格 */
@@ -123,6 +122,8 @@
       grid-template-columns:1fr;
       justify-items:center;
       gap:10px;
+      height: 180px;
+      align-content: center;
     }
     .emoji{
       font-size:clamp(70px,8vw,90px);
@@ -226,7 +227,7 @@
 
     /* 隱藏 emoji 和注音的樣式 */
     .emoji.hidden-content {
-      display: none;
+      visibility: hidden;
     }
     
     ruby rt.hidden-content {
@@ -661,4 +662,5 @@
     // 初次載入：等待使用者按「開始練習」
   </script>
 </body>
+</html>
 </html>
