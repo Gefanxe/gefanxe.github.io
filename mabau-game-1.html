@@ -31,6 +31,7 @@
       display:flex;
       justify-content:center;
       padding:24px 24px 48px 24px;
+      min-height:100vh;
     }
 
     /* 容器卡片：採卡片+陰影風格 */
@@ -40,6 +41,9 @@
       border-radius:24px;
       box-shadow:0 20px 40px rgba(0,0,0,0.08);
       padding:clamp(16px,3vw,28px);
+      display: flex;
+      flex-direction: column;
+      min-height: calc(100vh - 96px);
     }
 
     /* 標題列：emoji + Bootstrap Icons 風格（以emoji替代） */
@@ -116,6 +120,9 @@
       border-radius:20px;
       padding:clamp(14px,3vw,24px);
       margin-top:8px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
     }
     .prompt{
       display:grid;
@@ -125,6 +132,12 @@
       height: 180px;
       align-content: center;
     }
+
+    /* 初始隱藏提示區塊 */
+    .prompt.hidden {
+      display: none;
+    }
+
     .emoji{
       font-size:clamp(70px,8vw,90px);
       line-height:1;
@@ -162,6 +175,8 @@
       display:grid;
       grid-template-columns:repeat(2, minmax(0,1fr));
       gap:12px;
+      flex: 1;
+      align-content: center;
     }
     @media (min-width:720px){
       .options{ grid-template-columns:repeat(4, minmax(0,1fr)); }
@@ -198,6 +213,12 @@
       gap:25px;
       justify-content:center;
     }
+
+    #startBtn {
+      /* height: 100px; */
+      font-size: x-large;
+    }
+
     .btn{
       font-size:larger;
       border:none;
@@ -259,6 +280,7 @@
       color: var(--muted);
       font-size: 16px;
       position: relative;
+      margin-top: auto;
     }
     .footer-center{
       display: flex;
@@ -279,6 +301,32 @@
       right: 0;
       font-weight: 600;
       color: #ffb74c;
+    }
+
+    /* 鼓勵文字區塊 */
+    .welcome-message {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+      font-size: clamp(18px, 3vw, 22px);
+      line-height: 1.6;
+      margin: 20px 0;
+    }
+
+    .welcome-message h2 {
+      color: var(--primary-dark);
+      font-size: clamp(24px, 4vw, 32px);
+      margin-bottom: 20px;
+      font-weight: 800;
+    }
+
+    .welcome-message p {
+      margin: 16px 0;
+      font-weight: 600;
+    }
+
+    .welcome-message.hidden {
+      display: none;
     }
   </style>
   <!-- Google tag (gtag.js) -->
@@ -319,7 +367,12 @@
 
     <!-- 題目卡 -->
     <section class="card">
-      <div class="prompt">
+      <!-- 歡迎訊息 -->
+      <div id="welcomeMessage" class="welcome-message">
+        <h2 id="encourageText"></h2>
+      </div>
+
+      <div class="prompt hidden">
         <div id="emoji" class="emoji">🍎</div>
         <div id="noun" class="noun">
           <!-- 以 ruby 顯示：中文字 + 注音 -->
@@ -434,6 +487,20 @@
     let showEmoji = true; // 控制 emoji 顯示狀態
     let showZhuyin = true; // 控制注音顯示狀態
 
+    // 鼓勵話語陣列
+    const ENCOURAGE_MESSAGES = [
+      "🌈 一起來學量詞吧！",
+      "⭐ 你是最棒的！",
+      "🦋 慢慢來，我們一定會學得會！",
+      "🌸 今天要開心學習喔！",
+      "🐻 相信自己，你很聰明！",
+      "🎈 這次要答對幾題？",
+      "🌺 這次挑戰成功有什麼獎勵？",
+      "🌟 等一下會厲害的嚇到我嗎！",
+      "🦄 這次要變得更厲害！",
+      "🎀 加油！我們可以做得很好！"
+    ];
+
     // DOM
     const scoreEl = document.getElementById('score');
     const streakEl = document.getElementById('streak');
@@ -446,6 +513,9 @@
     const resetBtn = document.getElementById('resetBtn');
     const toggleEmojiBtn = document.getElementById('toggleEmojiBtn');
     const toggleZyBtn = document.getElementById('toggleZyBtn');
+    const promptEl = document.querySelector('.prompt');
+    const welcomeMessageEl = document.getElementById('welcomeMessage');
+    const encourageTextEl = document.getElementById('encourageText');
 
     // Web Audio API：答對/答錯旋律
     function beep(ok=true){
@@ -614,11 +684,21 @@
       }
     }
 
+    // 隨機選擇鼓勵話語
+    function setRandomEncourageMessage() {
+      const randomIndex = rnd(ENCOURAGE_MESSAGES.length);
+      encourageTextEl.textContent = ENCOURAGE_MESSAGES[randomIndex];
+    }
+
     // 事件：開始／下一題／重置
     startBtn.onclick = ()=>{
       score = 0; streak = 0;
       scoreEl.textContent = score;
       streakEl.textContent = streak;
+      
+      // 隱藏歡迎訊息，顯示提示區塊
+      welcomeMessageEl.classList.add('hidden');
+      promptEl.classList.remove('hidden');
       
       // 隱藏開始按鈕，顯示其他控制按鈕
       startBtn.classList.add('hidden');
@@ -638,6 +718,13 @@
       streakEl.textContent = streak;
       feedbackEl.textContent = '';
       feedbackEl.className = 'feedback';
+      
+      // 顯示歡迎訊息，隱藏提示區塊
+      welcomeMessageEl.classList.remove('hidden');
+      promptEl.classList.add('hidden');
+      
+      // 重新隨機選擇鼓勵話語
+      setRandomEncourageMessage();
       
       // 重置按鈕顯示狀態
       startBtn.classList.remove('hidden');
@@ -659,8 +746,8 @@
       optsEl.innerHTML = '';
     };
 
-    // 初次載入：等待使用者按「開始練習」
+    // 初次載入：設定隨機鼓勵話語
+    setRandomEncourageMessage();
   </script>
 </body>
-</html>
 </html>
