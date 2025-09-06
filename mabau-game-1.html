@@ -52,6 +52,15 @@
       gap:12px;
       margin-bottom:12px;
     }
+
+    /* 標題左側區域 */
+    .title-section{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
     .title{
       display:flex;
       align-items:center;
@@ -60,6 +69,31 @@
       font-weight:800;
       color:var(--primary-dark);
     }
+
+    /* 標題區域的切換按鈕 */
+    .title-controls{
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+
+    .title-btn{
+      font-size:14px;
+      border:none;
+      background: #ffe0b2;
+      color:#6d4c41;
+      font-weight:600;
+      padding:6px 10px;
+      border-radius:8px;
+      cursor:pointer;
+      box-shadow:0 4px 8px rgba(244,81,30,.25);
+      transition:background .2s ease, transform .06s ease;
+      touch-action:manipulation;
+      white-space:nowrap;
+    }
+    .title-btn:hover{ background:#ffd08a; }
+    .title-btn:active{ transform:translateY(1px); }
+
     .scoreboard{
       display:flex;
       align-items:center;
@@ -110,6 +144,10 @@
       color:#8d6e63;
     }
 
+    ruby.ans rb{
+      font-size: 1.3em;
+    }
+
     ruby.ans rt{
       font-size:.7em;
       color:#ffffff;
@@ -130,7 +168,8 @@
 
     /* 選項按鈕 */
     .opt{
-      height: 100px;
+      /* width: 100px; */
+      height: 80px;
       border:none;
       border-radius:16px;
       /* padding:10px 10px 10px 10px; */
@@ -150,7 +189,7 @@
     .opt.correct{ background:var(--good); box-shadow:0 10px 20px rgba(46,125,50,.28); }
     .opt.wrong{ background:var(--bad); box-shadow:0 10px 20px rgba(198,40,40,.28); }
 
-    /* 底部控制列 */
+    /* 控制列 */
     .controls{
       margin-top:16px;
       display:flex;
@@ -178,6 +217,19 @@
 
     /* 按鈕隱藏樣式 */
     .btn.hidden {
+      display: none;
+    }
+    
+    .title-btn.hidden {
+      display: none;
+    }
+
+    /* 隱藏 emoji 和注音的樣式 */
+    .emoji.hidden-content {
+      display: none;
+    }
+    
+    ruby rt.hidden-content {
       display: none;
     }
 
@@ -251,7 +303,13 @@
   <main class="app">
     <!-- 標題＋分數板 -->
     <div class="header">
-      <div class="title">🎯 量詞練習遊戲（觸碰作答）</div>
+      <div class="title-section">
+        <div class="title">🎯 量詞練習遊戲</div>
+        <div class="title-controls">
+          <button id="toggleEmojiBtn" class="title-btn hidden">隱藏圖片</button>
+          <button id="toggleZyBtn" class="title-btn hidden">隱藏注音</button>
+        </div>
+      </div>
       <div class="scoreboard">
         📊 分數 <span id="score" class="badge">0</span>
         ✅ 連續答對 <span id="streak" class="badge" style="background:#66bb6a;box-shadow:0 6px 16px rgba(102,187,106,.25)">0</span>
@@ -278,7 +336,7 @@
       <div class="controls">
         <button id="startBtn" class="btn primary">▶️ 開始練習</button>
         <button id="nextBtn" class="btn hidden">➡️ 下一題</button>
-        <button id="resetBtn" class="btn hidden">🔄 重新開始（清分數）</button>
+        <button id="resetBtn" class="btn hidden">🔄 重新開始</button>
       </div>
     </section>
 
@@ -372,6 +430,8 @@
     let current = null;
     let usedIndex = -1;
     let lock = false; // 防連點
+    let showEmoji = true; // 控制 emoji 顯示狀態
+    let showZhuyin = true; // 控制注音顯示狀態
 
     // DOM
     const scoreEl = document.getElementById('score');
@@ -383,6 +443,8 @@
     const startBtn = document.getElementById('startBtn');
     const nextBtn  = document.getElementById('nextBtn');
     const resetBtn = document.getElementById('resetBtn');
+    const toggleEmojiBtn = document.getElementById('toggleEmojiBtn');
+    const toggleZyBtn = document.getElementById('toggleZyBtn');
 
     // Web Audio API：答對/答錯旋律
     function beep(ok=true){
@@ -443,10 +505,49 @@
       return out;
     }
 
+    // 切換 emoji 顯示/隱藏
+    function toggleEmoji() {
+      showEmoji = !showEmoji;
+      
+      if (showEmoji) {
+        emojiEl.classList.remove('hidden-content');
+        toggleEmojiBtn.textContent = '隱藏圖片';
+      } else {
+        emojiEl.classList.add('hidden-content');
+        toggleEmojiBtn.textContent = '顯示圖片';
+      }
+    }
+
+    // 切換注音顯示/隱藏
+    function toggleZhuyin() {
+      showZhuyin = !showZhuyin;
+      
+      if (showZhuyin) {
+        toggleZyBtn.textContent = '隱藏注音';
+        // 顯示所有注音
+        document.querySelectorAll('ruby rt').forEach(rt => {
+          rt.classList.remove('hidden-content');
+        });
+      } else {
+        toggleZyBtn.textContent = '顯示注音';
+        // 隱藏所有注音
+        document.querySelectorAll('ruby rt').forEach(rt => {
+          rt.classList.add('hidden-content');
+        });
+      }
+    }
+
     // 題面渲染（含注音 ruby）
     function renderPrompt(q){
       emojiEl.textContent = q.emo;
-      nounEl.innerHTML = `<ruby><rb>${q.n}</rb><rt>${q.nz}</rt></ruby>`;
+      nounEl.innerHTML = `<ruby><rb>${q.n}</rb><rt class="${showZhuyin ? '' : 'hidden-content'}">${q.nz}</rt></ruby>`;
+      
+      // 根據當前狀態設置 emoji 顯示
+      if (!showEmoji) {
+        emojiEl.classList.add('hidden-content');
+      } else {
+        emojiEl.classList.remove('hidden-content');
+      }
     }
 
     // 產生一題
@@ -475,7 +576,7 @@
       options.forEach(op=>{
         const btn = document.createElement('button');
         btn.className = 'opt';
-        btn.innerHTML = `<ruby class="ans"><rb>${op.han}</rb><rt>${op.zy}</rt></ruby>`;
+        btn.innerHTML = `<ruby class="ans"><rb>${op.han}</rb><rt class="${showZhuyin ? '' : 'hidden-content'}">${op.zy}</rt></ruby>`;
         btn.onclick = ()=> choose(op, correct, btn);
         optsEl.appendChild(btn);
       });
@@ -521,11 +622,15 @@
       // 隱藏開始按鈕，顯示其他控制按鈕
       startBtn.classList.add('hidden');
       nextBtn.classList.remove('hidden');
+      toggleEmojiBtn.classList.remove('hidden');
+      toggleZyBtn.classList.remove('hidden');
       resetBtn.classList.remove('hidden');
       
       newQuestion();
     };
     nextBtn.onclick = ()=> newQuestion();
+    toggleEmojiBtn.onclick = toggleEmoji;
+    toggleZyBtn.onclick = toggleZhuyin;
     resetBtn.onclick = ()=>{
       score = 0; streak = 0;
       scoreEl.textContent = score;
@@ -536,10 +641,19 @@
       // 重置按鈕顯示狀態
       startBtn.classList.remove('hidden');
       nextBtn.classList.add('hidden');
+      toggleEmojiBtn.classList.add('hidden');
+      toggleZyBtn.classList.add('hidden');
       resetBtn.classList.add('hidden');
+      
+      // 重置提示顯示狀態
+      showEmoji = true;
+      showZhuyin = true;
+      toggleEmojiBtn.textContent = '隱藏圖片';
+      toggleZyBtn.textContent = '隱藏注音';
       
       // 清空題目顯示
       emojiEl.textContent = '🍎';
+      emojiEl.classList.remove('hidden-content');
       nounEl.innerHTML = '<ruby><rb>蘋果</rb><rt>ㄆㄧㄥˊ ㄍㄨㄛˇ</rt></ruby>';
       optsEl.innerHTML = '';
     };
