@@ -24,18 +24,13 @@
   <!-- 一般 meta 標籤 -->
   <meta name="description" content="專為6歲孩童設計的中文量詞練習遊戲，50個精心設計的題目，每題都附有注音，幫助學習發音。互動式學習，讓孩子在遊戲中快樂學習量詞！" />
   <meta name="keywords" content="量詞,中文學習,兒童教育,注音符號,語言學習,教育遊戲" />
-
+  <link type="text/css" rel="stylesheet" href="./assets/phon.css" charset="utf8">
   <style>
     /* -----------------------------------------------------------
        內嵌 Bootswatch：Yeti 風格（節錄並微調）
        說明：依規則從 bootswatch 主題中隨機挑選並整合於 <style>。
        著重色彩、按鈕、卡片、陰影、排版（已調整為暖色系）。
     ------------------------------------------------------------*/
-    @font-face { 
-      font-family: BopomofoRuby;
-      src: url(./fonts/BopomofoRuby1909-v1-Regular.ttf);
-    }
-
     :root{
       --primary:#ff7043;     /* 主色：活潑橘 */
       --primary-dark:#f4511e;
@@ -53,7 +48,6 @@
       margin:0;
       background:var(--bg);
       color:var(--text);
-      font-family:'Microsoft JhengHei', Arial, sans-serif;
       display:flex;
       justify-content:center;
       padding:24px 24px 48px 24px;
@@ -151,11 +145,11 @@
       flex-direction: column;
     }
     .prompt{
-      display: flex;
+      /* display: flex;
       justify-content: center;
-      gap:10px;
-      height: 180px;
       align-content: center;
+      gap:10px; */
+      margin: 0 auto;
     }
 
     /* 初始隱藏提示區塊 */
@@ -164,34 +158,29 @@
     }
 
     .emoji{
-      font-size:clamp(70px,8vw,90px);
-      line-height:1;
-      align-self: center;
+      font-size:clamp(90px,8vw,100px);
+      vertical-align: super;
     }
-    .noun{
-      font-family: BopomofoRuby;
+    /* .noun{
+      font-family: BopomofoRuby, 'AR KaiB5', 'KaiTi TW', '標楷體';
       font-size:clamp(34px,3vw,38px);
-      font-weight:800;
-      text-align:center;
       color:#5d4037;
       writing-mode: vertical-rl;
       -webkit-writing-mode: vertical-rl;
       -moz-writing-mode: vertical-rl;
       text-orientation: upright;
-    }
+    } */
 
     ruby {
       /* ruby-position: under; */
+      margin: 16px 0;
     }
 
+    /* ruby rb{ } */
+
     ruby rt{
-      font-size:.7em;
       color:#8d6e63;
-      margin: 0 10px;
-      ruby-align: center;
-      text-align: center;
-      text-orientation: upright;
-      letter-spacing: 0;
+      margin-left: 4px;
     }
 
     ruby.ans rb{
@@ -212,7 +201,7 @@
       grid-template-columns:repeat(2, minmax(0,1fr));
       gap:12px;
       flex: 1;
-      align-content: center;
+      align-content: end;
     }
     @media (min-width:720px){
       .options{ grid-template-columns:repeat(4, minmax(0,1fr)); }
@@ -409,11 +398,14 @@
       </div>
 
       <div class="prompt hidden">
-        <div id="emoji" class="emoji">🍎</div>
-        <div id="noun" class="noun">
-          <!-- 以 ruby 顯示：中文字 + 注音 -->
-          <ruby><rb>蘋果</rb><rt>ㄆㄧㄥˊ ㄍㄨㄛˇ</rt></ruby>
-        </div>
+        <span id="emoji" class="emoji">🍎</span>
+        <!-- <span id="noun" class="noun"> -->
+        <span class="dummy2 tb v ruby">
+          <div id="noun">
+            <!-- 以 ruby 顯示：中文字 + 注音 -->
+
+          </div>
+        </span>
       </div>
 
       <!-- 選項按鈕（量詞＋注音） -->
@@ -462,56 +454,56 @@
 
     // 題庫 50 題（題目＋正確量詞，全含注音）
     const DATA = [
-      {emo:"🍎", n:"蘋果", nz:"ㄆㄧㄥˊ ㄍㄨㄛˇ", m:"顆", mz:"ㄎㄜ"},
-      {emo:"🐶", n:"狗", nz:"ㄍㄡˇ", m:"隻", mz:"ㄓ"},
-      {emo:"🐱", n:"貓", nz:"ㄇㄠ", m:"隻", mz:"ㄓ"},
-      {emo:"🐟", n:"魚", nz:"ㄩˊ", m:"條", mz:"ㄊㄧㄠˊ"},
-      {emo:"🐦", n:"鳥", nz:"ㄋㄧㄠˇ", m:"隻", mz:"ㄓ"},
-      {emo:"📖", n:"書", nz:"ㄕㄨ", m:"本", mz:"ㄅㄣˇ"},
-      {emo:"🖊️", n:"筆", nz:"ㄅㄧˇ", m:"支", mz:"ㄓ"},
-      {emo:"☂️", n:"雨傘", nz:"ㄩˇ ㄙㄢˇ", m:"把", mz:"ㄅㄚˇ"},
-      {emo:"🪑", n:"椅子", nz:"ㄧˇ ㄗ˙", m:"張", mz:"ㄓㄤ"},
-      {emo:"🛋️", n:"桌子", nz:"ㄓㄨㄛ ㄗ˙", m:"張", mz:"ㄓㄤ"},
-      {emo:"🚗", n:"車", nz:"ㄔㄜ", m:"輛", mz:"ㄌㄧㄤˋ"},
-      {emo:"🚲", n:"自行車", nz:"ㄗˋ ㄒㄧㄥˊ ㄔㄜ", m:"台", mz:"ㄊㄞˊ"},
-      {emo:"🖥️", n:"電腦", nz:"ㄉㄧㄢˋ ㄋㄠˇ", m:"台", mz:"ㄊㄞˊ"},
-      {emo:"📱", n:"手機", nz:"ㄕㄡˇ ㄐㄧ", m:"部", mz:"ㄅㄨˋ"},
-      {emo:"📺", n:"電視", nz:"ㄉㄧㄢˋ ㄕˋ", m:"部", mz:"ㄅㄨˋ"},
-      {emo:"🥤", n:"杯子", nz:"ㄅㄟ ㄗ˙", m:"個", mz:"ㄍㄜˋ"},
-      {emo:"✉️", n:"信", nz:"ㄒㄧㄣˋ", m:"封", mz:"ㄈㄥ"},
-      {emo:"👟", n:"鞋子", nz:"ㄒㄧㄝˊ ㄗ˙", m:"雙", mz:"ㄕㄨㄤ"},
-      {emo:"🥢", n:"筷子", nz:"ㄎㄨㄞˋ ㄗ˙", m:"雙", mz:"ㄕㄨㄤ"},
-      {emo:"👖", n:"褲子", nz:"ㄎㄨˋ ㄗ˙", m:"條", mz:"ㄊㄧㄠˊ"},
-      {emo:"👗", n:"裙子", nz:"ㄑㄩㄣˊ ㄗ˙", m:"件", mz:"ㄐㄧㄢˋ"},
-      {emo:"👕", n:"衣服", nz:"ㄧ ㄈㄨˊ", m:"件", mz:"ㄐㄧㄢˋ"},
-      {emo:"🧢", n:"帽子", nz:"ㄇㄠˋ ㄗ˙", m:"頂", mz:"ㄉㄧㄥˇ"},
-      {emo:"🧤", n:"手套", nz:"ㄕㄡˇ ㄊㄠˋ", m:"副", mz:"ㄈㄨˋ"},
-      {emo:"👓", n:"眼鏡", nz:"ㄧㄢˇ ㄐㄧㄥˋ", m:"副", mz:"ㄈㄨˋ"},
-      {emo:"🗺️", n:"地圖", nz:"ㄉㄧˋ ㄊㄨˊ", m:"張", mz:"ㄓㄤ"},
-      {emo:"🖼️", n:"相片", nz:"ㄒㄧㄤˋ ㄆㄧㄢˋ", m:"張", mz:"ㄓㄤ"},
-      {emo:"🎫", n:"票", nz:"ㄆㄧㄠˋ", m:"張", mz:"ㄓㄤ"},
-      {emo:"📄", n:"紙", nz:"ㄓˇ", m:"張", mz:"ㄓㄤ"},
-      {emo:"🍪", n:"餅乾", nz:"ㄅㄧㄥˇ ㄍㄢ", m:"片", mz:"ㄆㄧㄢˋ"},
-      {emo:"🎂", n:"蛋糕", nz:"ㄉㄢˋ ㄍㄠ", m:"塊", mz:"ㄎㄨㄞˋ"},
-      {emo:"🥯", n:"麵包", nz:"ㄇㄧㄢˋ ㄅㄠ", m:"個", mz:"ㄍㄜˋ"},
-      {emo:"🍉", n:"西瓜", nz:"ㄒㄧ ㄍㄨㄚ", m:"顆", mz:"ㄎㄜ"},
-      {emo:"🌸", n:"花", nz:"ㄏㄨㄚ", m:"朵", mz:"ㄉㄨㄛˇ"},
-      {emo:"🌳", n:"樹", nz:"ㄕㄨˋ", m:"棵", mz:"ㄎㄜ"},
-      {emo:"⛰️", n:"山", nz:"ㄕㄢ", m:"座", mz:"ㄗㄨㄛˋ"},
-      {emo:"🏠", n:"房子", nz:"ㄈㄤˊ ㄗ˙", m:"棟", mz:"ㄉㄨㄥˋ"},
-      {emo:"🌉", n:"橋", nz:"ㄑㄧㄠˊ", m:"座", mz:"ㄗㄨㄛˋ"},
-      {emo:"🏞️", n:"河", nz:"ㄏㄜˊ", m:"條", mz:"ㄊㄧㄠˊ"},
-      {emo:"🛤️", n:"路", nz:"ㄌㄨˋ", m:"條", mz:"ㄊㄧㄠˊ"},
-      {emo:"☁️", n:"雲", nz:"ㄩㄣˊ", m:"朵", mz:"ㄉㄨㄛˇ"},
-      {emo:"⭐", n:"星星", nz:"ㄒㄧㄥ ㄒㄧㄥ", m:"顆", mz:"ㄎㄜ"},
-      {emo:"🌞", n:"太陽", nz:"ㄊㄞˋ ㄧㄤˊ", m:"顆", mz:"ㄎㄜ"},
-      {emo:"🌕", n:"月亮", nz:"ㄩㄝˋ ㄌㄧㄤˋ", m:"輪", mz:"ㄌㄨㄣˊ"},
-      {emo:"🪥", n:"牙刷", nz:"ㄧㄚˊ ㄕㄨㄚ", m:"支", mz:"ㄓ"},
-      {emo:"🪥", n:"牙膏", nz:"ㄧㄚˊ ㄍㄠ", m:"條", mz:"ㄊㄧㄠˊ"},
-      {emo:"💡", n:"燈泡", nz:"ㄉㄥ ㄆㄠˋ", m:"顆", mz:"ㄎㄜ"},
-      {emo:"🗝️", n:"鑰匙", nz:"ㄧㄠˋ ㄕ˙", m:"把", mz:"ㄅㄚˇ"},
-      {emo:"🚪", n:"門", nz:"ㄇㄣˊ", m:"扇", mz:"ㄕㄢˋ"},
-      {emo:"🪟", n:"窗戶", nz:"ㄔㄨㄤ ㄏㄨˋ", m:"扇", mz:"ㄕㄢˋ"}
+      {emo:"🍎", n:["蘋","果"], nz:["ㄆㄧㄥˊ","ㄍㄨㄛˇ"], m:"顆", mz:"ㄎㄜ"},
+      {emo:"🐶", n:["狗"], nz:["ㄍㄡˇ"], m:"隻", mz:"ㄓ"},
+      {emo:"🐱", n:["貓"], nz:["ㄇㄠ"], m:"隻", mz:"ㄓ"},
+      {emo:"🐟", n:["魚"], nz:["ㄩˊ"], m:"條", mz:"ㄊㄧㄠˊ"},
+      {emo:"🐦", n:["鳥"], nz:["ㄋㄧㄠˇ"], m:"隻", mz:"ㄓ"},
+      {emo:"📖", n:["書"], nz:["ㄕㄨ"], m:"本", mz:"ㄅㄣˇ"},
+      {emo:"🖊️", n:["筆"], nz:["ㄅㄧˇ"], m:"支", mz:"ㄓ"},
+      {emo:"☂️", n:["雨","傘"], nz:["ㄩˇ","ㄙㄢˇ"], m:"把", mz:"ㄅㄚˇ"},
+      {emo:"🪑", n:["椅","子"], nz:["ㄧˇ","ㄗ˙"], m:"張", mz:"ㄓㄤ"},
+      {emo:"🛋️", n:["桌","子"], nz:["ㄓㄨㄛ","ㄗ˙"], m:"張", mz:"ㄓㄤ"},
+      {emo:"🚗", n:["車"], nz:["ㄔㄜ"], m:"輛", mz:"ㄌㄧㄤˋ"},
+      {emo:"🚲", n:["自","行","車"], nz:["ㄗˋ","ㄒㄧㄥˊ","ㄔㄜ"], m:"台", mz:"ㄊㄞˊ"},
+      {emo:"🖥️", n:["電","腦"], nz:["ㄉㄧㄢˋ","ㄋㄠˇ"], m:"台", mz:"ㄊㄞˊ"},
+      {emo:"📱", n:["手","機"], nz:["ㄕㄡˇ","ㄐㄧ"], m:"部", mz:"ㄅㄨˋ"},
+      {emo:"📺", n:["電","視"], nz:["ㄉㄧㄢˋ","ㄕˋ"], m:"部", mz:"ㄅㄨˋ"},
+      {emo:"🥤", n:["杯","子"], nz:["ㄅㄟ","ㄗ˙"], m:"個", mz:"ㄍㄜˋ"},
+      {emo:"✉️", n:["信"], nz:["ㄒㄧㄣˋ"], m:"封", mz:"ㄈㄥ"},
+      {emo:"👟", n:["鞋","子"], nz:["ㄒㄧㄝˊ","ㄗ˙"], m:"雙", mz:"ㄕㄨㄤ"},
+      {emo:"🥢", n:["筷","子"], nz:["ㄎㄨㄞˋ","ㄗ˙"], m:"雙", mz:"ㄕㄨㄤ"},
+      {emo:"👖", n:["褲","子"], nz:["ㄎㄨˋ","ㄗ˙"], m:"條", mz:"ㄊㄧㄠˊ"},
+      {emo:"👗", n:["裙","子"], nz:["ㄑㄩㄣˊ","ㄗ˙"], m:"件", mz:"ㄐㄧㄢˋ"},
+      {emo:"👕", n:["衣","服"], nz:["ㄧ","ㄈㄨˊ"], m:"件", mz:"ㄐㄧㄢˋ"},
+      {emo:"🧢", n:["帽","子"], nz:["ㄇㄠˋ","ㄗ˙"], m:"頂", mz:"ㄉㄧㄥˇ"},
+      {emo:"🧤", n:["手","套"], nz:["ㄕㄡˇ","ㄊㄠˋ"], m:"副", mz:"ㄈㄨˋ"},
+      {emo:"👓", n:["眼","鏡"], nz:["ㄧㄢˇ","ㄐㄧㄥˋ"], m:"副", mz:"ㄈㄨˋ"},
+      {emo:"🗺️", n:["地","圖"], nz:["ㄉㄧˋ","ㄊㄨˊ"], m:"張", mz:"ㄓㄤ"},
+      {emo:"🖼️", n:["相","片"], nz:["ㄒㄧㄤˋ","ㄆㄧㄢˋ"], m:"張", mz:"ㄓㄤ"},
+      {emo:"🎫", n:["票"], nz:["ㄆㄧㄠˋ"], m:"張", mz:"ㄓㄤ"},
+      {emo:"📄", n:["紙"], nz:["ㄓˇ"], m:"張", mz:"ㄓㄤ"},
+      {emo:"🍪", n:["餅","乾"], nz:["ㄅㄧㄥˇ","ㄍㄢ"], m:"片", mz:"ㄆㄧㄢˋ"},
+      {emo:"🎂", n:["蛋","糕"], nz:["ㄉㄢˋ","ㄍㄠ"], m:"塊", mz:"ㄎㄨㄞˋ"},
+      {emo:"🥯", n:["麵","包"], nz:["ㄇㄧㄢˋ","ㄅㄠ"], m:"個", mz:"ㄍㄜˋ"},
+      {emo:"🍉", n:["西","瓜"], nz:["ㄒㄧ","ㄍㄨㄚ"], m:"顆", mz:"ㄎㄜ"},
+      {emo:"🌸", n:["花"], nz:["ㄏㄨㄚ"], m:"朵", mz:"ㄉㄨㄛˇ"},
+      {emo:"🌳", n:["樹"], nz:["ㄕㄨˋ"], m:"棵", mz:"ㄎㄜ"},
+      {emo:"⛰️", n:["山"], nz:["ㄕㄢ"], m:"座", mz:"ㄗㄨㄛˋ"},
+      {emo:"🏠", n:["房","子"], nz:["ㄈㄤˊ","ㄗ˙"], m:"棟", mz:"ㄉㄨㄥˋ"},
+      {emo:"🌉", n:["橋"], nz:["ㄑㄧㄠˊ"], m:"座", mz:"ㄗㄨㄛˋ"},
+      {emo:"🏞️", n:["河"], nz:["ㄏㄜˊ"], m:"條", mz:"ㄊㄧㄠˊ"},
+      {emo:"🛤️", n:["路"], nz:["ㄌㄨˋ"], m:"條", mz:"ㄊㄧㄠˊ"},
+      {emo:"☁️", n:["雲"], nz:["ㄩㄣˊ"], m:"朵", mz:"ㄉㄨㄛˇ"},
+      {emo:"⭐", n:["星","星"], nz:["ㄒㄧㄥ","ㄒㄧㄥ"], m:"顆", mz:"ㄎㄜ"},
+      {emo:"🌞", n:["太","陽"], nz:["ㄊㄞˋ","ㄧㄤˊ"], m:"顆", mz:"ㄎㄜ"},
+      {emo:"🌕", n:["月","亮"], nz:["ㄩㄝˋ","ㄌㄧㄤˋ"], m:"輪", mz:"ㄌㄨㄣˊ"},
+      {emo:"🪥", n:["牙","刷"], nz:["ㄧㄚˊ","ㄕㄨㄚ"], m:"支", mz:"ㄓ"},
+      {emo:"🪥", n:["牙","膏"], nz:["ㄧㄚˊ","ㄍㄠ"], m:"條", mz:"ㄊㄧㄠˊ"},
+      {emo:"💡", n:["燈","泡"], nz:["ㄉㄥ","ㄆㄠˋ"], m:"顆", mz:"ㄎㄜ"},
+      {emo:"🗝️", n:["鑰","匙"], nz:["ㄧㄠˋ","ㄕ˙"], m:"把", mz:"ㄅㄚˇ"},
+      {emo:"🚪", n:["門"], nz:["ㄇㄣˊ"], m:"扇", mz:"ㄕㄢˋ"},
+      {emo:"🪟", n:["窗","戶"], nz:["ㄔㄨㄤ","ㄏㄨˋ"], m:"扇", mz:"ㄕㄢˋ"}
     ];
 
     // 狀態
@@ -647,7 +639,17 @@
     // 題面渲染（含注音 ruby）
     function renderPrompt(q){
       emojiEl.textContent = q.emo;
-      nounEl.innerHTML = `<ruby><rb>${q.n}</rb><rt class="${showZhuyin ? '' : 'hidden-content'}">${q.nz}</rt></ruby>`;
+      
+      // 將陣列格式的中文字與注音組合成 ruby 標籤
+      const rubyPairs = q.n.map((char, index) => `
+<idiv>
+  <ruby>
+    <rb>${char}</rb>
+    <rt class="${showZhuyin ? '' : 'hidden-content'}">${q.nz[index]}</rt>
+  </ruby>
+</idiv>
+      `);
+      nounEl.innerHTML = rubyPairs.join('');
       
       // 根據當前狀態設置 emoji 顯示
       if (!showEmoji) {
@@ -778,7 +780,7 @@
       // 清空題目顯示
       emojiEl.textContent = '🍎';
       emojiEl.classList.remove('hidden-content');
-      nounEl.innerHTML = '<ruby><rb>蘋果</rb><rt>ㄆㄧㄥˊ ㄍㄨㄛˇ</rt></ruby>';
+      nounEl.innerHTML = '<ruby><rb>蘋</rb><rt>ㄆㄧㄥˊ</rt></ruby><ruby><rb>果</rb><rt>ㄍㄨㄛˇ</rt></ruby>';
       optsEl.innerHTML = '';
     };
 
