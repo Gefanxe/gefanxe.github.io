@@ -196,7 +196,7 @@
 
     /* 選項區：2欄 RWD，平板以上 4 欄 */
     .options{
-      margin-top:16px;
+      /* margin-top:16px; */
       display:grid;
       grid-template-columns:repeat(2, minmax(0,1fr));
       gap:12px;
@@ -685,7 +685,7 @@
         btn.className = 'opt';
         btn.innerHTML = `
 <span class="dummy2 tb v ruby">
-  <span style="font-size: 2rem;">
+  <span style="font-size: 30px;">
     <ruby class="ans">
       <rb>${op.han}</rb>
       <rt class="${showZhuyin ? '' : 'hidden-content'}">${op.zy}</rt>
