@@ -40,7 +40,7 @@ idiv {
 }
 
 .tb {
-    writing-mode: tb-rl;
+    writing-mode: vertical-lr;
     /* width:100%;  */
 }
 

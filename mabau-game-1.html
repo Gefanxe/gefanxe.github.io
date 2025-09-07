@@ -209,11 +209,8 @@
 
     /* 選項按鈕 */
     .opt{
-      /* width: 100px; */
-      height: 80px;
       border:none;
       border-radius:16px;
-      /* padding:10px 10px 10px 10px; */
       font-size:clamp(24px,2.4vw,28px);
       font-weight:600;
       background:var(--primary);
@@ -282,9 +279,10 @@
 
     /* 回饋訊息 */
     .feedback{
+      /* height: 71px; */
       min-height:1.8em;
       text-align:center;
-      margin-top:10px;
+      /* margin-top:10px; */
       font-size:clamp(18px,2.6vw,22px);
       font-weight:800;
     }
@@ -685,7 +683,16 @@
       options.forEach(op=>{
         const btn = document.createElement('button');
         btn.className = 'opt';
-        btn.innerHTML = `<ruby class="ans"><rb>${op.han}</rb><rt class="${showZhuyin ? '' : 'hidden-content'}">${op.zy}</rt></ruby>`;
+        btn.innerHTML = `
+<span class="dummy2 tb v ruby">
+  <span style="font-size: 2rem;">
+    <ruby class="ans">
+      <rb>${op.han}</rb>
+      <rt class="${showZhuyin ? '' : 'hidden-content'}">${op.zy}</rt>
+    </ruby>
+  </span>
+</span>
+`;
         btn.onclick = ()=> choose(op, correct, btn);
         optsEl.appendChild(btn);
       });
@@ -710,7 +717,14 @@
       }else{
         streak = 0;
         streakEl.textContent = streak;
-        feedbackEl.innerHTML = `再想想～正確量詞是：<ruby><rb>${correct.han}</rb><rt>${correct.zy}</rt></ruby>`;
+        feedbackEl.innerHTML = `
+  再想想～正確量詞是：
+  <span class="dummy2 tb v ruby" style="height: 40px;">
+    <span style="font-size: 26px;">
+      <ruby><rb>${correct.han}</rb><rt>${correct.zy}</rt></ruby>
+    </span>
+  </span>
+        `;
         feedbackEl.className = 'feedback no';
         btn.classList.add('wrong');
         // 高亮正解
@@ -778,9 +792,9 @@
       toggleZyBtn.textContent = '隱藏注音';
       
       // 清空題目顯示
-      emojiEl.textContent = '🍎';
+      emojiEl.textContent = '';
       emojiEl.classList.remove('hidden-content');
-      nounEl.innerHTML = '<ruby><rb>蘋</rb><rt>ㄆㄧㄥˊ</rt></ruby><ruby><rb>果</rb><rt>ㄍㄨㄛˇ</rt></ruby>';
+      nounEl.innerHTML = '';
       optsEl.innerHTML = '';
     };
 
