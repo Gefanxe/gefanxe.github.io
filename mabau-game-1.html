@@ -31,6 +31,11 @@
        說明：依規則從 bootswatch 主題中隨機挑選並整合於 <style>。
        著重色彩、按鈕、卡片、陰影、排版（已調整為暖色系）。
     ------------------------------------------------------------*/
+    @font-face { 
+      font-family: BopomofoRuby;
+      src: url(./fonts/BopomofoRuby1909-v1-Regular.ttf);
+    }
+
     :root{
       --primary:#ff7043;     /* 主色：活潑橘 */
       --primary-dark:#f4511e;
@@ -146,9 +151,8 @@
       flex-direction: column;
     }
     .prompt{
-      display:grid;
-      grid-template-columns:1fr;
-      justify-items:center;
+      display: flex;
+      justify-content: center;
       gap:10px;
       height: 180px;
       align-content: center;
@@ -162,21 +166,32 @@
     .emoji{
       font-size:clamp(70px,8vw,90px);
       line-height:1;
+      align-self: center;
     }
     .noun{
+      font-family: BopomofoRuby;
       font-size:clamp(34px,3vw,38px);
       font-weight:800;
       text-align:center;
       color:#5d4037;
+      writing-mode: vertical-rl;
+      -webkit-writing-mode: vertical-rl;
+      -moz-writing-mode: vertical-rl;
+      text-orientation: upright;
     }
 
     ruby {
-      ruby-position: under;
+      /* ruby-position: under; */
     }
 
     ruby rt{
       font-size:.7em;
       color:#8d6e63;
+      margin: 0 10px;
+      ruby-align: center;
+      text-align: center;
+      text-orientation: upright;
+      letter-spacing: 0;
     }
 
     ruby.ans rb{
