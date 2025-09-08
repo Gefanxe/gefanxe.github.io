@@ -139,17 +139,17 @@
       border:1px solid #ffe0b2;
       border-radius:20px;
       padding:clamp(14px,3vw,24px);
-      margin-top:8px;
+      /* margin-top:8px; */
       flex: 1;
       display: flex;
       flex-direction: column;
     }
     .prompt{
-      /* display: flex;
+      display: flex;
       justify-content: center;
       align-content: center;
-      gap:10px; */
-      margin: 0 auto;
+      gap:10px;
+      /* margin: 0 auto; */
     }
 
     /* 初始隱藏提示區塊 */
@@ -163,6 +163,7 @@
     }
     #noun {
       display: flex;
+      justify-content: space-evenly;
     }
     /* .noun{
       font-family: BopomofoRuby, 'AR KaiB5', 'KaiTi TW', '標楷體';
@@ -204,22 +205,33 @@
       margin-top: 5px;
     } */
 
+    .ansScope {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: end;
+    }
+
 
     /* 選項區：2欄 RWD，平板以上 4 欄 */
     .options{
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
       /* margin-top:16px; */
-      display:grid;
+      /* display:grid;
       grid-template-columns:repeat(2, minmax(0,1fr));
       gap: 5px;
       flex: 1;
-      align-content: stretch;
+      align-content: stretch; */
     }
-    @media (min-width:720px){
+    /* @media (min-width:720px){
       .options{ 
         grid-template-columns:repeat(4, minmax(0,1fr)); 
         align-content: end;
       }
-    }
+    } */
 
     /* 選項按鈕 */
     .opt{
@@ -240,13 +252,13 @@
     .opt:active{ transform:translateY(1px); }
 
     /* PC 螢幕尺寸時限制按鈕最大尺寸 */
-    @media (min-width:720px){
+    /* @media (min-width:720px){
       .opt{
         max-width: 200px;
         max-height: 80px;
         margin: 0 auto;
       }
-    }
+    } */
 
     /* 作答後狀態 */
     .opt.correct{ background:var(--good); box-shadow:0 10px 20px rgba(46,125,50,.28); }
@@ -431,17 +443,20 @@
         </span>
       </div>
 
-      <!-- 選項按鈕（量詞＋注音） -->
-      <div id="options" class="options"></div>
+      <div class="ansScope" >
 
-      <!-- 回饋 -->
-      <div id="feedback" class="feedback"></div>
-
-      <!-- 控制列 -->
-      <div class="controls">
-        <button id="startBtn" class="btn primary">▶️ 開始練習</button>
-        <button id="nextBtn" class="btn hidden">➡️ 下一題</button>
-        <button id="resetBtn" class="btn hidden">🔄 重新開始</button>
+        <!-- 選項按鈕（量詞＋注音） -->
+        <div id="options" class="options"></div>
+  
+        <!-- 回饋 -->
+        <div id="feedback" class="feedback"></div>
+  
+        <!-- 控制列 -->
+        <div class="controls">
+          <button id="startBtn" class="btn primary">▶️ 開始練習</button>
+          <button id="nextBtn" class="btn hidden">➡️ 下一題</button>
+          <button id="resetBtn" class="btn hidden">🔄 重新開始</button>
+        </div>
       </div>
     </section>
 
@@ -488,7 +503,7 @@
       {emo:"🪑", n:["椅","子"], nz:["ㄧˇ","ㄗ˙"], m:"張", mz:"ㄓㄤ"},
       {emo:"🛋️", n:["桌","子"], nz:["ㄓㄨㄛ","ㄗ˙"], m:"張", mz:"ㄓㄤ"},
       {emo:"🚗", n:["車"], nz:["ㄔㄜ"], m:"輛", mz:"ㄌㄧㄤˋ"},
-      {emo:"🚲", n:["自","行","車"], nz:["ㄗˋ","ㄒㄧㄥˊ","ㄔㄜ"], m:"台", mz:"ㄊㄞˊ"},
+      {emo:"🚲", n:["單","車"], nz:["ㄉㄢ","ㄔㄜ"], m:"台", mz:"ㄊㄞˊ"},
       {emo:"🖥️", n:["電","腦"], nz:["ㄉㄧㄢˋ","ㄋㄠˇ"], m:"台", mz:"ㄊㄞˊ"},
       {emo:"📱", n:["手","機"], nz:["ㄕㄡˇ","ㄐㄧ"], m:"部", mz:"ㄅㄨˋ"},
       {emo:"📺", n:["電","視"], nz:["ㄉㄧㄢˋ","ㄕˋ"], m:"部", mz:"ㄅㄨˋ"},
