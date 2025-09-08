@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover" />
   <title>量詞練習遊戲｜無限隨機・觸碰作答（50題＋注音）</title>
   
   <!-- Open Graph / Facebook -->
@@ -52,6 +52,9 @@
       justify-content:center;
       padding:24px 24px 48px 24px;
       min-height:100vh;
+      min-height:100dvh; /* 動態視窗高度，適配 iPhone 底部工具列 */
+      /* 針對 iPhone Safari 的安全區域調整 */
+      padding-bottom:max(48px, env(safe-area-inset-bottom));
     }
 
     /* 容器卡片：採卡片+陰影風格 */
@@ -64,6 +67,10 @@
       display: flex;
       flex-direction: column;
       min-height: calc(100vh - 96px);
+      min-height: calc(100dvh - 96px); /* 動態視窗高度 */
+      max-height: calc(100vh - 96px);
+      max-height: calc(100dvh - 96px); /* 確保不超過視窗高度 */
+      overflow-y: auto; /* 如有需要可滾動 */
     }
 
     /* 標題列：emoji + Bootstrap Icons 風格（以emoji替代） */
