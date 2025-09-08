@@ -398,7 +398,7 @@
       <div class="prompt hidden">
         <span id="emoji" class="emoji">🍎</span>
         <!-- <span id="noun" class="noun"> -->
-        <span class="dummy2 tb v ruby">
+        <span class="dummy2 tb v after">
           <div id="noun">
             <!-- 以 ruby 顯示：中文字 + 注音 -->
 
@@ -640,12 +640,7 @@
       
       // 將陣列格式的中文字與注音組合成 ruby 標籤
       const rubyPairs = q.n.map((char, index) => `
-<idiv>
-  <ruby>
-    <rb>${char}</rb>
-    <rt class="${showZhuyin ? '' : 'hidden-content'}">${q.nz[index]}</rt>
-  </ruby>
-</idiv>
+<idiv data-after="${showZhuyin ? q.nz[index] : ''}">${char}</idiv>
       `);
       nounEl.innerHTML = rubyPairs.join('');
       
