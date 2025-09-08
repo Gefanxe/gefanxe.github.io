@@ -121,7 +121,7 @@ idiv {
     position: absolute;
     text-align: center;
     font-size: 26%;
-    color: #888;
+    /* color: #888; */
 }
 
 .h.after [data-after] {

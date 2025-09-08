@@ -158,8 +158,11 @@
     }
 
     .emoji{
-      font-size:clamp(90px,8vw,100px);
+      font-size:clamp(70px,8vw,80px);
       vertical-align: super;
+    }
+    #noun {
+      display: flex;
     }
     /* .noun{
       font-family: BopomofoRuby, 'AR KaiB5', 'KaiTi TW', '標楷體';
@@ -171,14 +174,22 @@
       text-orientation: upright;
     } */
 
-    ruby {
-      /* ruby-position: under; */
-      margin: 16px 0;
+    .ansBtn {
+      color:#fff
     }
+
+    .ansBtn [data-after]::after {
+      color:#fff
+    }
+
+    /* ruby {
+      ruby-position: under;
+      margin: 16px 0;
+    } */
 
     /* ruby rb{ } */
 
-    ruby rt{
+    /* ruby rt{
       color:#8d6e63;
       margin-left: 4px;
     }
@@ -191,7 +202,7 @@
       font-size:.7em;
       color:#ffffff;
       margin-top: 5px;
-    }
+    } */
 
 
     /* 選項區：2欄 RWD，平板以上 4 欄 */
@@ -199,16 +210,21 @@
       /* margin-top:16px; */
       display:grid;
       grid-template-columns:repeat(2, minmax(0,1fr));
-      gap:12px;
+      gap: 5px;
       flex: 1;
-      align-content: end;
+      align-content: stretch;
     }
     @media (min-width:720px){
-      .options{ grid-template-columns:repeat(4, minmax(0,1fr)); }
+      .options{ 
+        grid-template-columns:repeat(4, minmax(0,1fr)); 
+        align-content: end;
+      }
     }
 
     /* 選項按鈕 */
     .opt{
+      width: 120px;
+      height: 80px;
       border:none;
       border-radius:16px;
       font-size:clamp(24px,2.4vw,28px);
@@ -223,16 +239,25 @@
     .opt:hover{ background:var(--primary-dark); }
     .opt:active{ transform:translateY(1px); }
 
+    /* PC 螢幕尺寸時限制按鈕最大尺寸 */
+    @media (min-width:720px){
+      .opt{
+        max-width: 200px;
+        max-height: 80px;
+        margin: 0 auto;
+      }
+    }
+
     /* 作答後狀態 */
     .opt.correct{ background:var(--good); box-shadow:0 10px 20px rgba(46,125,50,.28); }
     .opt.wrong{ background:var(--bad); box-shadow:0 10px 20px rgba(198,40,40,.28); }
 
     /* 控制列 */
     .controls{
-      margin-top:16px;
+      margin-top: 5px;
       display:flex;
       flex-wrap:wrap;
-      gap:25px;
+      gap: 10px;
       justify-content:center;
     }
 
@@ -246,7 +271,7 @@
       border:none;
       background:#ffe0b2;
       color:#6d4c41;
-      font-weight:800;
+      font-weight:500;
       padding:10px 16px;
       border-radius:12px;
       cursor:pointer;
@@ -282,7 +307,7 @@
       /* height: 71px; */
       min-height:1.8em;
       text-align:center;
-      /* margin-top:10px; */
+      margin-top: 5px;
       font-size:clamp(18px,2.6vw,22px);
       font-weight:800;
     }
@@ -340,7 +365,7 @@
       color: var(--primary-dark);
       font-size: clamp(24px, 4vw, 32px);
       margin-bottom: 20px;
-      font-weight: 800;
+      font-weight: 500;
     }
 
     .welcome-message p {
@@ -679,14 +704,11 @@
         const btn = document.createElement('button');
         btn.className = 'opt';
         btn.innerHTML = `
-<span class="dummy2 tb v ruby">
-  <span style="font-size: 30px;">
-    <ruby class="ans">
-      <rb>${op.han}</rb>
-      <rt class="${showZhuyin ? '' : 'hidden-content'}">${op.zy}</rt>
-    </ruby>
-  </span>
-</span>
+<div style="margin: 0 auto;" class="dummy2 tb v after">
+  <div class="ansBtn">
+    <idiv data-after="${showZhuyin ? op.zy : ''}">${op.han}</idiv>
+  </div>
+</div>
 `;
         btn.onclick = ()=> choose(op, correct, btn);
         optsEl.appendChild(btn);
@@ -714,9 +736,9 @@
         streakEl.textContent = streak;
         feedbackEl.innerHTML = `
   再想想～正確量詞是：
-  <span class="dummy2 tb v ruby" style="height: 40px;">
+  <span class="dummy2 tb v after">
     <span style="font-size: 26px;">
-      <ruby><rb>${correct.han}</rb><rt>${correct.zy}</rt></ruby>
+      <idiv data-after="${showZhuyin ? correct.zy : ''}">${correct.han}</idiv>
     </span>
   </span>
         `;
