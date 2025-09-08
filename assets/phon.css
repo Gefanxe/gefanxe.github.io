@@ -62,7 +62,7 @@ idiv {
 
     & idiv,
     &.after [data-after] {
-        height: 1.4em;
+        /* height: 1.4em; */
         margin-right: 0.4em;
     }
 
@@ -121,7 +121,7 @@ idiv {
     position: absolute;
     text-align: center;
     font-size: 26%;
-    color: #888;
+    /* color: #888; */
 }
 
 .h.after [data-after] {
