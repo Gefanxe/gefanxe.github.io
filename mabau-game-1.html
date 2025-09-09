@@ -565,6 +565,22 @@
     let audioLock = false; // 防止音效播放中被打斷
     let showEmoji = true; // 控制 emoji 顯示狀態
     let showZhuyin = true; // 控制注音顯示狀態
+    let autoNextTimer = null; // 自動跳題計時器
+    
+    // 音頻上下文（全域共用，避免重複創建）
+    let audioContext = null;
+    
+    // 初始化音頻上下文
+    function initAudioContext() {
+      if (!audioContext) {
+        try {
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        } catch (e) {
+          console.warn('Audio context creation failed:', e);
+        }
+      }
+      return audioContext;
+    }
 
     // 鼓勵話語陣列
     const ENCOURAGE_MESSAGES = [
@@ -599,57 +615,70 @@
     // Web Audio API：答對/答錯旋律
     function beep(ok=true){
       if(audioLock) return; // 防止音效重疊
-      audioLock = true;
       
-      const ctx = new (window.AudioContext||window.webkitAudioContext)();
-      let totalDuration = 0;
+      const ctx = initAudioContext();
+      if (!ctx) return; // 如果音頻上下文創建失敗，靜默返回
       
-      if(ok){
-        // 答對旋律：Do-Mi-Sol 上行音階 (C-E-G)
-        const notes = [523.25, 659.25, 783.99]; // C5, E5, G5
-        notes.forEach((freq, i) => {
-          const o = ctx.createOscillator();
-          const g = ctx.createGain();
-          o.type = 'triangle';
-          o.frequency.value = freq;
-          o.connect(g);
-          g.connect(ctx.destination);
-          
-          const startTime = ctx.currentTime + i * 0.15;
-          g.gain.setValueAtTime(0.001, startTime);
-          g.gain.exponentialRampToValueAtTime(0.23, startTime + 0.03);
-          g.gain.exponentialRampToValueAtTime(0.001, startTime + 0.12);
-          
-          o.start(startTime);
-          o.stop(startTime + 0.12);
-        });
-        totalDuration = 3 * 0.15; // 0.45秒
-      } else {
-        // 答錯旋律：Sol-Mi-Do 下行音階 (G-E-C)
-        const notes = [783.99, 659.25, 523.25]; // G5, E5, C5
-        notes.forEach((freq, i) => {
-          const o = ctx.createOscillator();
-          const g = ctx.createGain();
-          o.type = 'sawtooth';
-          o.frequency.value = freq;
-          o.connect(g);
-          g.connect(ctx.destination);
-          
-          const startTime = ctx.currentTime + i * 0.18;
-          g.gain.setValueAtTime(0.001, startTime);
-          g.gain.exponentialRampToValueAtTime(0.12, startTime + 0.02);
-          g.gain.exponentialRampToValueAtTime(0.001, startTime + 0.15);
-          
-          o.start(startTime);
-          o.stop(startTime + 0.15);
-        });
-        totalDuration = 3 * 0.18; // 0.54秒
+      // 確保音頻上下文處於運行狀態
+      if (ctx.state === 'suspended') {
+        ctx.resume().catch(e => console.warn('Audio context resume failed:', e));
       }
       
-      // 音效播放完成後解除鎖定
-      setTimeout(() => {
-        audioLock = false;
-      }, (totalDuration + 0.1) * 1000); // 多加0.1秒緩衝
+      audioLock = true;
+      let totalDuration = 0;
+      
+      try {
+        if(ok){
+          // 答對旋律：Do-Mi-Sol 上行音階 (C-E-G)
+          const notes = [523.25, 659.25, 783.99]; // C5, E5, G5
+          notes.forEach((freq, i) => {
+            const o = ctx.createOscillator();
+            const g = ctx.createGain();
+            o.type = 'triangle';
+            o.frequency.value = freq;
+            o.connect(g);
+            g.connect(ctx.destination);
+            
+            const startTime = ctx.currentTime + i * 0.15;
+            g.gain.setValueAtTime(0.001, startTime);
+            g.gain.exponentialRampToValueAtTime(0.23, startTime + 0.03);
+            g.gain.exponentialRampToValueAtTime(0.001, startTime + 0.12);
+            
+            o.start(startTime);
+            o.stop(startTime + 0.12);
+          });
+          totalDuration = 3 * 0.15; // 0.45秒
+        } else {
+          // 答錯旋律：Sol-Mi-Do 下行音階 (G-E-C)
+          const notes = [783.99, 659.25, 523.25]; // G5, E5, C5
+          notes.forEach((freq, i) => {
+            const o = ctx.createOscillator();
+            const g = ctx.createGain();
+            o.type = 'sawtooth';
+            o.frequency.value = freq;
+            o.connect(g);
+            g.connect(ctx.destination);
+            
+            const startTime = ctx.currentTime + i * 0.18;
+            g.gain.setValueAtTime(0.001, startTime);
+            g.gain.exponentialRampToValueAtTime(0.12, startTime + 0.02);
+            g.gain.exponentialRampToValueAtTime(0.001, startTime + 0.15);
+            
+            o.start(startTime);
+            o.stop(startTime + 0.15);
+          });
+          totalDuration = 3 * 0.18; // 0.54秒
+        }
+        
+        // 音效播放完成後解除鎖定
+        setTimeout(() => {
+          audioLock = false;
+        }, (totalDuration + 0.1) * 1000); // 多加0.1秒緩衝
+        
+      } catch (e) {
+        console.warn('Audio playback failed:', e);
+        audioLock = false; // 發生錯誤時立即解除鎖定
+      }
     }
 
     // 工具：隨機整數
@@ -719,7 +748,18 @@
 
     // 產生一題
     function newQuestion(){
-      if(audioLock) return; // 音效播放中不允許切換題目
+      // 清除任何正在進行的自動跳題計時器
+      if (autoNextTimer) {
+        clearTimeout(autoNextTimer);
+        autoNextTimer = null;
+      }
+      
+      // 如果音效正在播放，等待一小段時間再執行
+      if(audioLock) {
+        setTimeout(() => newQuestion(), 100);
+        return;
+      }
+      
       lock = false;
       feedbackEl.textContent = '';
       feedbackEl.className = 'feedback';
@@ -761,6 +801,12 @@
       if(lock) return;
       lock = true;
 
+      // 清除任何正在進行的自動跳題計時器
+      if (autoNextTimer) {
+        clearTimeout(autoNextTimer);
+        autoNextTimer = null;
+      }
+
       const isOk = sel.han===correct.han;
       if(isOk){
         score++; streak++;
@@ -770,8 +816,11 @@
         feedbackEl.className = 'feedback ok';
         btn.classList.add('correct');
         beep(true);
-        // 答對時1.3秒後自動下一題
-        setTimeout(()=>{ newQuestion(); }, 1300);
+        // 答對時1.3秒後自動下一題，使用計時器變數追蹤
+        autoNextTimer = setTimeout(()=>{
+          autoNextTimer = null;
+          newQuestion();
+        }, 1300);
       }else{
         streak = 0;
         streakEl.textContent = streak;
@@ -802,6 +851,9 @@
 
     // 事件：開始／下一題／重置
     startBtn.onclick = ()=>{
+      // 初始化音頻上下文（需要用戶互動才能啟動）
+      initAudioContext();
+      
       score = 0; streak = 0;
       scoreEl.textContent = score;
       streakEl.textContent = streak;
@@ -819,17 +871,42 @@
       
       newQuestion();
     };
-    nextBtn.onclick = ()=> newQuestion();
+    nextBtn.onclick = ()=> {
+      // 清除自動跳題計時器（如果存在）
+      if (autoNextTimer) {
+        clearTimeout(autoNextTimer);
+        autoNextTimer = null;
+      }
+      newQuestion();
+    };
     toggleEmojiBtn.onclick = toggleEmoji;
     toggleZyBtn.onclick = toggleZhuyin;
     resetBtn.onclick = ()=>{
-      if(audioLock) return; // 音效播放中不允許重置
+      // 清除自動跳題計時器
+      if (autoNextTimer) {
+        clearTimeout(autoNextTimer);
+        autoNextTimer = null;
+      }
+      
+      // 如果音效正在播放，強制停止
+      if(audioLock) {
+        audioLock = false;
+        if (audioContext && audioContext.state === 'running') {
+          // 停止所有正在進行的音頻節點
+          try {
+            audioContext.suspend();
+          } catch (e) {
+            console.warn('Failed to suspend audio context:', e);
+          }
+        }
+      }
       
       score = 0; streak = 0;
       scoreEl.textContent = score;
       streakEl.textContent = streak;
       feedbackEl.textContent = '';
       feedbackEl.className = 'feedback';
+      lock = false; // 重置鎖定狀態
       
       // 顯示歡迎訊息，隱藏提示區塊
       welcomeMessageEl.classList.remove('hidden');
