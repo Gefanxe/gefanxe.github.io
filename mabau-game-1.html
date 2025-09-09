@@ -669,14 +669,15 @@
       if (showZhuyin) {
         toggleZyBtn.textContent = '隱藏注音';
         // 顯示所有注音
-        document.querySelectorAll('ruby rt').forEach(rt => {
-          rt.classList.remove('hidden-content');
+        document.querySelectorAll('idiv').forEach(idiv => {
+          idiv.dataset.after = idiv.dataset.after2;
         });
       } else {
         toggleZyBtn.textContent = '顯示注音';
         // 隱藏所有注音
-        document.querySelectorAll('ruby rt').forEach(rt => {
-          rt.classList.add('hidden-content');
+        document.querySelectorAll('idiv').forEach(idiv => {
+          idiv.dataset.after2 = idiv.dataset.after;
+          idiv.dataset.after = '';
         });
       }
     }
