@@ -331,7 +331,7 @@
       /* height: 71px; */
       min-height:1.8em;
       text-align:center;
-      margin-top: 5px;
+      margin-bottom: 16px;
       font-size:clamp(18px,2.6vw,22px);
       font-weight:800;
     }
@@ -456,12 +456,13 @@
       </div>
 
       <div class="ansScope" >
-
-        <!-- 選項按鈕（量詞＋注音） -->
-        <div id="options" class="options"></div>
-  
         <!-- 回饋 -->
         <div id="feedback" class="feedback"></div>
+        
+        <!-- 選項按鈕（量詞＋注音） -->
+        <div id="options" class="options"></div>
+        
+        <div style="height: 1.5em;"></div>
   
         <!-- 控制列 -->
         <div class="controls">
@@ -734,7 +735,7 @@
       
       // 將陣列格式的中文字與注音組合成 ruby 標籤
       const rubyPairs = q.n.map((char, index) => `
-<idiv data-after="${showZhuyin ? q.nz[index] : ''}">${char}</idiv>
+<idiv data-after="${showZhuyin ? q.nz[index] : ''}" data-after2="${showZhuyin ? '' : q.nz[index]}">${char}</idiv>
       `);
       nounEl.innerHTML = rubyPairs.join('');
       
@@ -787,7 +788,7 @@
         btn.innerHTML = `
 <div style="margin: 0 auto;" class="dummy2 tb v after">
   <div class="ansBtn">
-    <idiv data-after="${showZhuyin ? op.zy : ''}">${op.han}</idiv>
+    <idiv data-after="${showZhuyin ? op.zy : ''}" data-after2="${showZhuyin ? '' : op.zy}">${op.han}</idiv>
   </div>
 </div>
 `;
@@ -828,7 +829,7 @@
   再想想～正確量詞是：
   <span class="dummy2 tb v after">
     <span style="font-size: 26px;">
-      <idiv data-after="${showZhuyin ? correct.zy : ''}">${correct.han}</idiv>
+      <idiv data-after="${showZhuyin ? correct.zy : ''}" data-after2="${showZhuyin ? '' : correct.zy}">${correct.han}</idiv>
     </span>
   </span>
         `;
