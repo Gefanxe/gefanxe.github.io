@@ -557,6 +557,7 @@
     let current = null;
     let usedIndex = -1;
     let lock = false; // 防連點
+    let audioLock = false; // 防止音效播放中被打斷
     let showEmoji = true; // 控制 emoji 顯示狀態
     let showZhuyin = true; // 控制注音顯示狀態
 
@@ -592,7 +593,11 @@
 
     // Web Audio API：答對/答錯旋律
     function beep(ok=true){
+      if(audioLock) return; // 防止音效重疊
+      audioLock = true;
+      
       const ctx = new (window.AudioContext||window.webkitAudioContext)();
+      let totalDuration = 0;
       
       if(ok){
         // 答對旋律：Do-Mi-Sol 上行音階 (C-E-G)
@@ -613,6 +618,7 @@
           o.start(startTime);
           o.stop(startTime + 0.12);
         });
+        totalDuration = 3 * 0.15; // 0.45秒
       } else {
         // 答錯旋律：Sol-Mi-Do 下行音階 (G-E-C)
         const notes = [783.99, 659.25, 523.25]; // G5, E5, C5
@@ -632,7 +638,13 @@
           o.start(startTime);
           o.stop(startTime + 0.15);
         });
+        totalDuration = 3 * 0.18; // 0.54秒
       }
+      
+      // 音效播放完成後解除鎖定
+      setTimeout(() => {
+        audioLock = false;
+      }, (totalDuration + 0.1) * 1000); // 多加0.1秒緩衝
     }
 
     // 工具：隨機整數
@@ -702,6 +714,7 @@
 
     // 產生一題
     function newQuestion(){
+      if(audioLock) return; // 音效播放中不允許切換題目
       lock = false;
       feedbackEl.textContent = '';
       feedbackEl.className = 'feedback';
@@ -805,6 +818,8 @@
     toggleEmojiBtn.onclick = toggleEmoji;
     toggleZyBtn.onclick = toggleZhuyin;
     resetBtn.onclick = ()=>{
+      if(audioLock) return; // 音效播放中不允許重置
+      
       score = 0; streak = 0;
       scoreEl.textContent = score;
       streakEl.textContent = streak;
