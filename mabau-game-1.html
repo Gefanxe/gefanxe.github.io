@@ -151,7 +151,6 @@
       border:1px solid #ffe0b2;
       border-radius:20px;
       padding:clamp(14px,3vw,24px);
-      /* margin-top:8px; */
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -161,7 +160,6 @@
       justify-content: center;
       align-content: center;
       gap:10px;
-      /* margin: 0 auto; */
     }
 
     /* 初始隱藏提示區塊 */
@@ -177,15 +175,6 @@
       display: flex;
       justify-content: space-evenly;
     }
-    /* .noun{
-      font-family: BopomofoRuby, 'AR KaiB5', 'KaiTi TW', '標楷體';
-      font-size:clamp(34px,3vw,38px);
-      color:#5d4037;
-      writing-mode: vertical-rl;
-      -webkit-writing-mode: vertical-rl;
-      -moz-writing-mode: vertical-rl;
-      text-orientation: upright;
-    } */
 
     .ansBtn {
       color:#fff
@@ -194,28 +183,6 @@
     .ansBtn [data-after]::after {
       color:#fff
     }
-
-    /* ruby {
-      ruby-position: under;
-      margin: 16px 0;
-    } */
-
-    /* ruby rb{ } */
-
-    /* ruby rt{
-      color:#8d6e63;
-      margin-left: 4px;
-    }
-
-    ruby.ans rb{
-      font-size: 1.3em;
-    }
-
-    ruby.ans rt{
-      font-size:.7em;
-      color:#ffffff;
-      margin-top: 5px;
-    } */
 
     .ansScope {
       flex: 1;
@@ -231,19 +198,7 @@
       flex-wrap: wrap;
       justify-content: center;
       gap: 10px;
-      /* margin-top:16px; */
-      /* display:grid;
-      grid-template-columns:repeat(2, minmax(0,1fr));
-      gap: 5px;
-      flex: 1;
-      align-content: stretch; */
     }
-    /* @media (min-width:720px){
-      .options{ 
-        grid-template-columns:repeat(4, minmax(0,1fr)); 
-        align-content: end;
-      }
-    } */
 
     /* 選項按鈕 */
     .opt{
@@ -262,15 +217,6 @@
     }
     .opt:hover{ background:var(--primary-dark); }
     .opt:active{ transform:translateY(1px); }
-
-    /* PC 螢幕尺寸時限制按鈕最大尺寸 */
-    /* @media (min-width:720px){
-      .opt{
-        max-width: 200px;
-        max-height: 80px;
-        margin: 0 auto;
-      }
-    } */
 
     /* 作答後狀態 */
     .opt.correct{ background:var(--good); box-shadow:0 10px 20px rgba(46,125,50,.28); }
@@ -449,8 +395,7 @@
         <!-- <span id="noun" class="noun"> -->
         <span class="dummy2 tb v after">
           <div id="noun">
-            <!-- 以 ruby 顯示：中文字 + 注音 -->
-
+            <!-- 顯示：中文字 + 注音 -->
           </div>
         </span>
       </div>
@@ -727,11 +672,11 @@
       }
     }
 
-    // 題面渲染（含注音 ruby）
+    // 題面渲染（含注音）
     function renderPrompt(q){
       emojiEl.textContent = q.emo;
       
-      // 將陣列格式的中文字與注音組合成 ruby 標籤
+      // 將陣列格式組合成中文字與注音標籤
       const rubyPairs = q.n.map((char, index) => `
 <idiv data-after="${showZhuyin ? q.nz[index] : ''}" data-after2="${showZhuyin ? '' : q.nz[index]}">${char}</idiv>
       `);
