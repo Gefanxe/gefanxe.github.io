@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>中文語音播放測試</title>
+  <style>
+    body{font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans TC', 'Helvetica Neue', Arial; margin:20px; background:#fafafa; color:#111}
+    .card{background:#fff;border-radius:10px;padding:18px;box-shadow:0 6px 18px rgba(10,10,10,0.06);max-width:900px;margin:auto}
+    label{display:block;margin-top:12px;font-weight:600}
+    select, textarea, input[type=range]{width:100%;box-sizing:border-box;padding:8px;margin-top:6px}
+    .row{display:flex;gap:12px}
+    .col{flex:1}
+    .controls{display:flex;gap:8px;margin-top:12px}
+    button{padding:8px 12px;border-radius:8px;border:1px solid #e6e6e6;background:#fff;cursor:pointer}
+    button.primary{background:#0b79ff;color:#fff;border:none}
+    .small{font-size:0.9rem;color:#666;margin-top:6px}
+    footer{max-width:900px;margin:18px auto;color:#666;font-size:0.9rem}
+    .voice-meta{font-size:0.85rem;color:#444}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>中文語音播放測試</h2>
+    <p class="small">利用瀏覽器的 SpeechSynthesis API 播放中文。選擇不同人聲（當前系統/瀏覽器提供的 voices）。</p>
+
+    <label for="engine">語音引擎 (目前僅支援瀏覽器內建)</label>
+    <select id="engine" disabled>
+      <option value="speechSynthesis">瀏覽器內建 SpeechSynthesis</option>
+    </select>
+
+    <label for="voiceSelect">人聲列表 (會優先顯示中文語系)</label>
+    <select id="voiceSelect"></select>
+    <div class="voice-meta" id="voiceMeta"></div>
+
+    <label for="text">要播放的中文文字</label>
+    <textarea id="text" rows="6">這是一段中文語音測試文字。您可以修改文字、速率、音高，並選擇不同的人聲來比較語音效果。</textarea>
+
+    <div class="row" style="margin-top:12px">
+      <div class="col">
+        <label for="rate">速率 (Rate) <span id="rateVal">1</span></label>
+        <input id="rate" type="range" min="0.5" max="2" step="0.1" value="1">
+      </div>
+      <div class="col">
+        <label for="pitch">音高 (Pitch) <span id="pitchVal">1</span></label>
+        <input id="pitch" type="range" min="0.5" max="2" step="0.1" value="1">
+      </div>
+      <div class="col">
+        <label for="volume">音量 (Volume) <span id="volumeVal">1</span></label>
+        <input id="volume" type="range" min="0" max="1" step="0.1" value="1">
+      </div>
+    </div>
+
+    <div class="controls">
+      <button id="speakBtn" class="primary">播放 (Speak)</button>
+      <button id="pauseBtn">暫停 (Pause)</button>
+      <button id="resumeBtn">繼續 (Resume)</button>
+      <button id="cancelBtn">停止 (Cancel)</button>
+      <button id="copySSMLBtn">複製 SSML（示例）</button>
+    </div>
+
+    <p class="small">說明：不同瀏覽器/作業系統會提供不同的人聲集合。若沒有中文人聲，請先確認作業系統是否安裝了中文語音或使用其他 TTS 服務。</p>
+  </div>
+
+  <footer>
+    <div>使用說明：載入後請從「人聲列表」選擇一個 voice，輸入中文文字，按 <strong>播放</strong>。若列表為空或缺少中文 voice，請嘗試重新載入網頁或在作業系統安裝中文語音。</div>
+  </footer>
+
+  <script>
+    const voiceSelect = document.getElementById('voiceSelect');
+    const voiceMeta = document.getElementById('voiceMeta');
+    const textEl = document.getElementById('text');
+    const rateEl = document.getElementById('rate');
+    const pitchEl = document.getElementById('pitch');
+    const volumeEl = document.getElementById('volume');
+    const speakBtn = document.getElementById('speakBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const resumeBtn = document.getElementById('resumeBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const copySSMLBtn = document.getElementById('copySSMLBtn');
+
+    const rateVal = document.getElementById('rateVal');
+    const pitchVal = document.getElementById('pitchVal');
+    const volumeVal = document.getElementById('volumeVal');
+
+    rateEl.addEventListener('input', ()=> rateVal.textContent = rateEl.value);
+    pitchEl.addEventListener('input', ()=> pitchVal.textContent = pitchEl.value);
+    volumeEl.addEventListener('input', ()=> volumeVal.textContent = volumeEl.value);
+
+    let voices = [];
+
+    function populateVoiceList(){
+      voices = speechSynthesis.getVoices();
+      voiceSelect.innerHTML = '';
+      if(!voices.length){
+        const opt = document.createElement('option');
+        opt.textContent = '（找不到任何 voice）';
+        voiceSelect.appendChild(opt);
+        voiceMeta.textContent = '';
+        return;
+      }
+
+      // Prefer zh voices first, then others
+      const zh = voices.filter(v => v.lang && v.lang.toLowerCase().startsWith('zh'));
+      const others = voices.filter(v => !(v.lang && v.lang.toLowerCase().startsWith('zh')));
+
+      function addGroup(list, label){
+        if(!list.length) return;
+        const group = document.createElement('optgroup');
+        group.label = label;
+        list.forEach(v=>{
+          const o = document.createElement('option');
+          o.value = v.name + '||' + v.lang + '||' + v.voiceURI;
+          o.textContent = `${v.name} — ${v.lang}` + (v.default? ' (default)':'');
+          group.appendChild(o);
+        });
+        voiceSelect.appendChild(group);
+      }
+
+      addGroup(zh, '中文語系 (zh)');
+      addGroup(others, '其他語系');
+
+      // select first chinese if available
+      if(zh.length) voiceSelect.selectedIndex = 0;
+      showSelectedMeta();
+    }
+
+    function showSelectedMeta(){
+      const val = voiceSelect.value;
+      if(!val) return;
+      const [name, lang, uri] = val.split('||');
+      voiceMeta.textContent = `選定：${name}（${lang}） — URI: ${uri}`;
+    }
+
+    voiceSelect.addEventListener('change', showSelectedMeta);
+
+    // Some browsers load voices asynchronously
+    populateVoiceList();
+    if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
+      speechSynthesis.onvoiceschanged = populateVoiceList;
+    }
+
+    function createUtterance(){
+      const text = textEl.value || '';
+      const utter = new SpeechSynthesisUtterance(text);
+      const val = voiceSelect.value;
+      if(val){
+        const [name, lang] = val.split('||');
+        const chosen = voices.find(v => v.name === name && v.lang === lang);
+        if(chosen) utter.voice = chosen;
+      }
+      utter.rate = parseFloat(rateEl.value);
+      utter.pitch = parseFloat(pitchEl.value);
+      utter.volume = parseFloat(volumeEl.value);
+      // If voice has a specific lang, ensure utterance uses it (helps some engines)
+      if(utter.voice && utter.voice.lang) utter.lang = utter.voice.lang;
+
+      // events for debugging
+      utter.onstart = ()=> console.log('tts start');
+      utter.onend = ()=> console.log('tts end');
+      utter.onerror = (e)=> console.error('tts error', e);
+      return utter;
+    }
+
+    speakBtn.addEventListener('click', ()=>{
+      if(!('speechSynthesis' in window)){
+        alert('此瀏覽器不支援 SpeechSynthesis API');
+        return;
+      }
+      speechSynthesis.cancel(); // cancel any current
+      const u = createUtterance();
+      speechSynthesis.speak(u);
+    });
+
+    pauseBtn.addEventListener('click', ()=>{
+      if(speechSynthesis.speaking && !speechSynthesis.paused){
+        speechSynthesis.pause();
+      }
+    });
+    resumeBtn.addEventListener('click', ()=>{
+      if(speechSynthesis.paused){
+        speechSynthesis.resume();
+      }
+    });
+    cancelBtn.addEventListener('click', ()=>{
+      speechSynthesis.cancel();
+    });
+
+    // provide a simple SSML example for users who want external engines
+    copySSMLBtn.addEventListener('click', ()=>{
+      const ssml = `<speak><voice name=\"YOUR_VOICE_NAME\">${textEl.value}</voice></speak>`;
+      navigator.clipboard?.writeText(ssml).then(()=>{
+        alert('已複製 SSML 示例到剪貼簿（請替換 YOUR_VOICE_NAME）');
+      }, ()=>alert('無法複製到剪貼簿'));
+    });
+
+    // Accessibility: allow Enter+Ctrl to speak
+    textEl.addEventListener('keydown', (e)=>{
+      if(e.ctrlKey && e.key === 'Enter'){
+        speakBtn.click();
+      }
+    });
+
+  </script>
+</body>
+</html>
