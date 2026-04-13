@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>找好朋友 (10的合成)</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f8ff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+    }
+    #app {
+      text-align: center;
+      width: 100%;
+      max-width: 800px;
+      padding: 20px;
+    }
+    .companion-area {
+      font-size: 28px;
+      color: #333;
+      margin-bottom: 40px;
+      padding: 15px;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      display: inline-block;
+      transition: all 0.3s ease;
+    }
+    .game-board {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 30px;
+      margin-bottom: 50px;
+    }
+    .card {
+      width: 140px;
+      height: 180px;
+      border-radius: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 80px;
+      font-weight: bold;
+      color: #333;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:active {
+      transform: scale(0.95);
+    }
+    .card.disabled {
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .card-target {
+      cursor: default;
+    }
+    .operator {
+      font-size: 60px;
+      font-weight: bold;
+      color: #666;
+    }
+    .options-area {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    /* 固定數字顏色 */
+    .num-1 { background-color: #FFB3BA; }
+    .num-2 { background-color: #FFDFBA; }
+    .num-3 { background-color: #FFFFBA; }
+    .num-4 { background-color: #BAFFC9; }
+    .num-5 { background-color: #BAE1FF; }
+    .num-6 { background-color: #E2BAFF; }
+    .num-7 { background-color: #FFBAE1; }
+    .num-8 { background-color: #E0E0E0; }
+    .num-9 { background-color: #FFE4E1; }
+
+    /* 動畫 */
+    .fade-out {
+      opacity: 0.2;
+      transform: scale(0.85);
+      transition: all 0.5s ease;
+    }
+    .shake {
+      animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+    }
+    .celebrate {
+      animation: pop 0.6s ease-out forwards;
+      z-index: 10;
+    }
+
+    @keyframes shake {
+      10%, 90% { transform: translate3d(-2px, 0, 0); }
+      20%, 80% { transform: translate3d(4px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-8px, 0, 0); }
+      40%, 60% { transform: translate3d(8px, 0, 0); }
+    }
+    @keyframes pop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); box-shadow: 0 0 30px rgba(255,215,0,0.8); }
+      100% { transform: scale(1.1); box-shadow: 0 0 20px rgba(255,215,0,0.6); }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="companion-area">
+      🐻 小熊說：「{{ companionMessage }}」
+    </div>
+
+    <div class="game-board">
+      <div class="card card-target" :class="['num-' + targetNum, { 'celebrate': successIndex !== -1 }]">
+        {{ targetNum }}
+      </div>
+      
+      <div class="operator">+</div>
+      
+      <div class="options-area">
+        <div 
+          v-for="(opt, index) in options" 
+          :key="index"
+          class="card"
+          :class="['num-' + opt, { 'shake': shakingIndex === index, 'celebrate': successIndex === index, 'fade-out': successIndex !== -1 && successIndex !== index, 'disabled': isLocked }]"
+          @click="checkAnswer(opt, index)"
+        >
+          {{ opt }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const { createApp, ref, onMounted } = Vue;
+
+    createApp({
+      setup() {
+        const targetNum = ref(3);
+        const options = ref([]);
+        const companionMessage = ref('我們來幫數字找好朋友吧！');
+        
+        const isLocked = ref(false); // 防止動畫期間重複點擊
+        const shakingIndex = ref(-1);
+        const successIndex = ref(-1);
+
+        // 語音合成函數
+        const speak = (text) => {
+          if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel(); // 停止先前的語音
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'zh-TW';
+            utterance.rate = 0.9; // 放慢一點點語速
+            window.speechSynthesis.speak(utterance);
+          }
+        };
+
+        const generateRound = () => {
+          isLocked.value = false;
+          successIndex.value = -1;
+          shakingIndex.value = -1;
+          companionMessage.value = `${targetNum.value} 的好朋友是誰呢？`;
+
+          // 產生正確答案與干擾項
+          const correctNum = 10 - targetNum.value;
+          let wrongNum;
+          do {
+            wrongNum = Math.floor(Math.random() * 9) + 1;
+          } while (wrongNum === correctNum || wrongNum === targetNum.value); // 確保干擾項不等於正確答案或目標數字
+
+          // 打亂選項陣列
+          const newOptions = [correctNum, wrongNum];
+          options.value = newOptions.sort(() => Math.random() - 0.5);
+          
+          // 語音提示
+          speak(companionMessage.value);
+        };
+
+        const initGame = () => {
+          // 初期先設定幾個簡單的對稱/基礎數字
+          const easyStarts = [1, 2, 5, 3, 4];
+          targetNum.value = easyStarts[Math.floor(Math.random() * easyStarts.length)];
+          generateRound();
+        };
+
+        const checkAnswer = (selectedNum, index) => {
+          if (isLocked.value) return;
+
+          const correctNum = 10 - targetNum.value;
+
+          if (selectedNum === correctNum) {
+            // 答對邏輯
+            isLocked.value = true;
+            successIndex.value = index;
+            companionMessage.value = `答對了！${targetNum.value} 和 ${selectedNum} 變成 10！`;
+            speak(companionMessage.value);
+            
+            // 延遲後進入下一題
+            setTimeout(() => {
+              // 隨機換下一個目標數字 (1~9)
+              targetNum.value = Math.floor(Math.random() * 9) + 1;
+              generateRound();
+            }, 3000);
+
+          } else {
+            // 答錯邏輯
+            shakingIndex.value = index;
+            companionMessage.value = '哎呀，不是他喔，再試試看！';
+            speak(companionMessage.value);
+            
+            // 移除動畫 class 以便下次點擊還能觸發
+            setTimeout(() => {
+              shakingIndex.value = -1;
+            }, 500);
+          }
+        };
+
+        onMounted(() => {
+          initGame();
+        });
+
+        return {
+          targetNum,
+          options,
+          companionMessage,
+          isLocked,
+          shakingIndex,
+          successIndex,
+          checkAnswer
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
